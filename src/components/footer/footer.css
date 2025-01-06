@@ -1,0 +1,33 @@
+/* footer  */
+footer {
+    background-color: var(--baseClr);
+}
+
+.footerNavBrand {
+    width: 180px;
+}
+
+.socialFooterLink {
+    font-size: 20px;
+}
+
+.socialFooterLink:hover {
+    filter: drop-shadow(0px 0px 10px black);
+}
+
+.footerHead {
+    color: var(--bsBlack);
+}
+
+.footerLast {
+    height: 50px;
+    background-color: var(--bsDark);
+}
+
+.backToTop {
+    cursor: pointer;
+}
+
+.nav-link:hover {
+    color: var(--bsBlack);
+}

@@ -1,0 +1,404 @@
+/* products */
+.productImgLink img {
+    transition: all 0.3s;
+    aspect-ratio: 1/1;
+}
+
+.productImgLink img:hover {
+    transform: scale(1.05);
+    transition: all 0.3s;
+}
+
+.explore a {
+    margin-bottom: 25px;
+}
+
+.newStyleHead {
+    font-size: 34px;
+    rotate: 270deg;
+    left: -51%;
+    bottom: 50%;
+    position: absolute;
+}
+
+.onSale:before {
+    content: "SALE";
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 20px;
+    color: var(--bsWhite);
+    background-color: var(--bsDark);
+    font-size: 12px;
+    top: 30px;
+    z-index: 1;
+}
+
+
+
+/* newsletter  */
+
+.sectHead {
+    font-size: 50px;
+}
+
+.shortProduct .btn {
+    color: #00000080;
+    font-weight: 600;
+}
+
+.shortProduct .btn:active {
+    border-color: transparent !important;
+}
+
+.shortProduct .activated {
+    color: var(--bsBlack);
+}
+
+.productCard {
+    width: 312px;
+    display: block;
+}
+
+.productCardImg {
+    height: 400px;
+    width: 312px;
+    overflow: hidden;
+}
+
+.productCar .productCardImg img {
+    transition: all 0.3s linear;
+}
+
+.productCard:hover .productCardImg img {
+    scale: 1.1;
+    transition: all 0.3s linear;
+}
+
+.itemName {
+    font-size: 16px;
+    color: var(--bsDark);
+}
+
+.productCard:hover .itemName {
+    color: var(--bsBlack);
+}
+
+.onHot::before {
+    content: "HOT";
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 20px;
+    color: var(--bsWhite);
+    background-color: #FF6F61;
+    font-size: 12px;
+    top: 30px;
+    z-index: 1;
+}
+
+
+/* zara branding  */
+.zaraBranding {
+    background-image: url(../../../assets/background/brandBanner.png);
+    height: 940px;
+    background-size: cover;
+    object-fit: contain;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.leftpannelZara {
+    width: 50%;
+    height: 100%;
+    margin-right: 0;
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 30px;
+    justify-content: end;
+    padding: 55px 90px;
+}
+
+.zaraText {
+    font-size: 26px;
+    width: 500px;
+}
+
+.zaraBtn:hover,
+.zaraBtn:active,
+.zaraBtn {
+    padding: 10px 25px;
+    font-size: 25px;
+    background-color: var(--bsWhite);
+    border-radius: 0px;
+    border: none;
+}
+
+
+
+
+
+
+
+/* follow us section  */
+.followUssection {
+    background-color: var(--baseClr);
+}
+
+.dispPicFollow .followBoxDiv {
+    width: 190px;
+    height: 190px;
+    transition: all 0.4s ease;
+    overflow: hidden;
+}
+
+.dispPicFollow .followBoxDiv:hover img {
+    scale: 1.1;
+    transition: all 0.4s ease;
+}
+
+.followInp {
+    max-width: 400px;
+    padding: 5px 0;
+    border: none;
+    background: transparent;
+    border-bottom: 2px solid var(--bsBlack);
+    height: 40px;
+    transition: all 0.4s ease;
+}
+
+.followInp:focus-visible {
+    outline: none;
+}
+
+.followBtn {
+    border: 2px solid transparent;
+    border-bottom: 2px solid var(--bsBlack);
+}
+
+.followBtn:hover,
+.followBtn:active {
+    background-color: var(--bsBlack);
+    color: var(--baseClr);
+    transition: all 0.4s ease;
+}
+
+
+
+
+/* responsive  */
+@media(max-width:1399px) {
+
+
+
+    .productCardImg {
+        height: 300px;
+    }
+
+    .productCardImg,
+    .productCard {
+        width: 250px;
+    }
+
+    .zaraBranding {
+        height: 590px;
+    }
+
+    .sellerButton {
+        padding: 15px;
+        top: 165px;
+    }
+
+    .dispPicFollow .followBoxDiv {
+        width: 170px;
+        height: 170px;
+    }
+
+}
+
+@media(max-width:1199px) {
+
+    .newStyleHead {
+        font-size: 25px;
+
+    }
+
+    .productCardImg,
+    .productCard {
+        width: 220px;
+    }
+
+    .productCardImg {
+        height: 290px;
+    }
+
+    .leftpannelZara {
+        margin-right: auto;
+    }
+
+    .sellerButton {
+        padding: 5px;
+        top: 170px;
+    }
+
+    .dispPicFollow .followBoxDiv {
+        width: 150px;
+        height: 150px;
+    }
+
+
+}
+
+@media(max-width:991px) {
+
+
+    .newStyleHead {
+        position: unset;
+        rotate: 0deg;
+    }
+
+
+    .sectHead {
+        font-size: 40px;
+    }
+
+    .productCardImg,
+    .productCard {
+        width: 300px;
+    }
+
+    .productCardImg {
+        height: auto;
+    }
+
+    .leftpannelZara {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .zaraBranding {
+        height: 400px;
+    }
+
+    .bestsellerCard .productCardImg,
+    .bestsellerCard .productCard {
+        width: 220px;
+    }
+
+    .sellerButton {
+        padding: 5px;
+        top: 165px;
+    }
+
+    .dispPicFollow .followBoxDiv {
+        width: 110px;
+        height: 110px;
+    }
+
+}
+
+@media(max-width:767px) {
+    .sectHead {
+        font-size: 30px;
+    }
+
+    .productCardImg {
+        width: 100%;
+    }
+
+    .productCard {
+        width: 40%;
+    }
+
+    .leftpannelZara {
+        text-align: center;
+    }
+
+    .zaraText {
+        width: auto;
+        font-size: 20px;
+    }
+
+    .brandingImg {
+        width: 80%;
+    }
+
+    .bestsellerCard .productCardImg,
+    .bestsellerCard .productCard {
+        width: 160px;
+    }
+
+    .sellerButton {
+        padding: 5px;
+        top: 126px;
+        font-size: 22px;
+    }
+
+    .dispPicFollow .followBoxDiv {
+        width: 80px;
+        height: 80px;
+    }
+
+
+
+
+
+
+
+
+
+
+}
+
+@media(max-width:575px) {
+
+
+
+    .newStyleHead {
+        font-size: 20px;
+    }
+
+    .sectHead {
+        font-size: 25px;
+    }
+
+    .shortProduct .btn {
+        font-size: 14px;
+        padding: 3px 5px;
+    }
+
+    .itemName {
+        font-size: 14px;
+    }
+
+    .onHot::before,
+    .onSale:before {
+        width: 35px;
+    }
+
+    .zaraHead {
+        width: 150px;
+    }
+
+    .zaraBtn:hover,
+    .zaraBtn:active,
+    .zaraBtn {
+        font-size: 20px;
+    }
+
+    .dispPicFollow {
+        flex-wrap: wrap;
+        width: 300px;
+        gap: 20px;
+        margin: auto;
+    }
+
+
+
+}

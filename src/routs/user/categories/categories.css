@@ -1,0 +1,58 @@
+.categoriesSection {
+    min-height: calc(100vh - 122px);
+}
+
+.categoryDiv .card {
+    width: 250px;
+    box-shadow: 0px 0px 5px #ddd;
+}
+
+.categoryDiv .card:hover {
+    box-shadow: 0px 0px 10px #bbb;
+}
+
+.categoryDiv .card .card-img-top {
+    object-fit: cover;
+    max-height: 165px;
+}
+
+.goBackBtn path {
+    color: var(--bsWhite);
+}
+
+.categoriesSection:before {
+    content: "";
+    position: fixed;
+    z-index: -1;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    background-image: url(../../../assets/background/shopBag.jpg);
+    background-position: right;
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 0.1;
+}
+
+/* responsive  */
+@media(max-width:1399px) {}
+
+@media(max-width:1199px) {}
+
+@media(max-width:991px) {}
+
+@media(max-width:767px) {
+    .categoryDiv .card {
+        width: 150px;
+    }
+
+    .categoryDiv .card .card-img-top {
+        max-height: 100px;
+    }
+
+    .categoryDiv .card .card-title {
+        font-size: 16px;
+    }
+}
+
+@media(max-width:575px) {}

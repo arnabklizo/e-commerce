@@ -1,0 +1,79 @@
+.termsSection::before {
+    content: "";
+    position: fixed;
+    z-index: -1;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    background-image: url(../../../assets/background/shop.png);
+    background-position: right;
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 0.05;
+}
+
+.separetor {
+    width: 50px;
+    height: 3px;
+}
+
+.terms-Pic {
+    overflow: hidden;
+}
+
+.terms-Pic img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.termsBox {
+    padding: 20px;
+}
+
+.termsBck {
+    background-color: var(--baseClr);
+}
+
+.termsBoxBack {
+    position: relative;
+    background-color: #000000bf;
+    color: var(--bsWhite);
+}
+
+.termsBoxBack:before {
+    position: absolute;
+    content: "";
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background-image: url(../../../assets/background/terms\ \(1\).jpg);
+    left: 0;
+    top: 0;
+    background-attachment: fixed;
+    z-index: -1;
+}
+
+.termsBoxBack svg path {
+    color: var(--bsWhite);
+}
+
+
+
+
+
+
+/* responsive  */
+@media(max-width:1399px) {}
+
+@media(max-width:1199px) {}
+
+@media(max-width:991px) {
+    .reverse {
+        flex-direction: column-reverse;
+    }
+}
+
+@media(max-width:767px) {}
+
+@media(max-width:575px) {}

@@ -1,0 +1,281 @@
+/* sidebar  */
+.dashboard .navSearch:hover,
+.dashboard .unhide {
+    width: 200px !important;
+    border-bottom: 2px solid var(--bsDark) !important;
+}
+
+.dashboardSection {
+    position: relative;
+}
+
+.dashboardSection:before {
+    content: "";
+    position: fixed;
+    z-index: -1;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    background-image: url(../../../assets/background/bag.png);
+    background-position: right;
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 0.1;
+}
+
+/* side bar  */
+.sidebarDeashboard {
+    width: 90px;
+    background: var(--baseClr);
+    height: calc(100vh - 127px);
+    padding: 5px;
+    transition: all 0.4s linear;
+
+    background-image: url(../../../assets/background/cart.png);
+    background-repeat: no-repeat;
+    background-position: bottom;
+    background-size: contain;
+    background-blend-mode: overlay;
+}
+
+.dashboardTopper {
+    justify-content: center;
+}
+
+.smallWidth .dashboardTopper {
+    justify-content: end;
+}
+
+.dashboardTopper h1 {
+    font-size: 30px;
+}
+
+.smallWidth {
+    width: 400px;
+    transition: all 0.4s linear;
+}
+
+.smallWidth .dashboardTopper h1 {
+    display: none;
+}
+
+
+
+/* close button dash board  */
+
+.closeDash {
+    cursor: pointer;
+}
+
+.closeDash input {
+    display: none;
+}
+
+.closeDash svg {
+    height: 50px;
+    transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.line {
+    fill: none;
+    stroke: var(--bsBlack);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 3;
+    transition: stroke-dasharray 600ms cubic-bezier(0.4, 0, 0.2, 1),
+        stroke-dashoffset 600ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.line-top-bottom {
+    stroke-dasharray: 12 63;
+}
+
+.closeDash input:checked+svg {
+    transform: rotate(-45deg);
+}
+
+.closeDash input:checked+svg .line-top-bottom {
+    stroke-dasharray: 20 300;
+    stroke-dashoffset: -32.42;
+}
+
+
+/* menu on dash-board  */
+.smallWidth .dasboard-list a {
+    width: 250px;
+    transition: all 0.4s linear;
+}
+
+.btnDashboard {
+    border: 1px solid #264653;
+    height: auto;
+}
+
+.btnDashboard span {
+    color: var(--bsDark);
+}
+
+.btnDashboard:active,
+.btnDashboard:hover {
+    background-color: var(--bsBlack) !important;
+}
+
+.btnDashboard:hover svg path,
+.btnDashboard:active span,
+.btnDashboard:hover span {
+    color: var(--bsWhite) !important;
+}
+
+.btnDashboardVisited {
+    background-color: #264653;
+    height: auto;
+}
+
+.btnDashboardVisited span {
+    color: var(--bsWhite);
+}
+
+.btnDashboardVisited:active,
+.btnDashboardVisited:hover {
+    background-color: var(--bsBlack) !important;
+}
+
+.btnDashboardVisited svg path {
+    color: var(--bsWhite);
+}
+
+.btnDashboardVisited:hover svg path,
+.btnDashboardVisited:active span,
+.btnDashboardVisited:hover span {
+    color: var(--bsWhite) !important;
+}
+
+.dashdMenu {
+    display: none;
+}
+
+.smallWidth .dashdMenu {
+    display: block;
+}
+
+.dasboard-list a {
+    width: 50px;
+    height: 50px;
+    transition: all 0.4s linear;
+}
+
+.cardDashedSide {
+    max-height: calc(100vh - 550px);
+    background-color: transparent;
+}
+
+.dassedColBtn {
+    width: 20px;
+    transition: all 0.4s linear;
+}
+
+.smallWidth .dassedColBtn {
+    width: 250px;
+    margin: auto;
+    height: 50px;
+    border: 1px solid var(--bsDark);
+    transition: all 0.4s linear;
+}
+
+.smallWidth .dassedColBtn span,
+.smallWidth .dassedColBtn {
+    color: var(--bsBlack);
+    transition: all 0.4s linear;
+}
+
+.smallWidth .dassedColBtn:hover svg path,
+.smallWidth .dassedColBtn:active,
+.smallWidth .dassedColBtn:hover,
+.smallWidth .dassedColBtn:active span,
+.smallWidth .dassedColBtn:hover span {
+    color: var(--bsWhite);
+    transition: all 0.4s linear;
+}
+
+.smallWidth .dassedColBtn:hover {
+    background-color: var(--bsDark);
+}
+
+.categoryBox {
+    display: none;
+    width: 20px;
+    transition: all 0.8s linear;
+}
+
+.smallWidth .categoryBox {
+    display: block;
+    width: 100%;
+    transition: all 0.8s linear;
+}
+
+.rotate90 {
+    rotate: 180deg;
+    transition: all 0.3s;
+}
+
+.catListSideBar {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.catListSideBar button {
+    display: flex;
+    width: 100%;
+    padding: 5px;
+    justify-content: space-between;
+    margin: 0;
+    background-color: transparent;
+    align-items: center;
+    font-size: 18px;
+
+}
+
+.catListSideBar button span {
+    color: var(--bsBlack);
+    font-weight: 600;
+}
+
+.catListSideBar button:hover {
+    background-color: var(--bsDark);
+}
+
+.catListSideBar button:hover span {
+    color: var(--bsDark);
+}
+
+.catListSideBar button:hover .catName {
+    color: var(--bsWhite);
+}
+
+.catData {
+    padding: 5px;
+    border: 1px solid var(--bsBlack);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    border-radius: 5px;
+    background-color: var(--bsWhite);
+}
+
+.pannelDashed tr {
+    background-image: linear-gradient(0deg, #e5e5e5, transparent, transparent);
+}
+
+.pannelDashed th {
+    border-bottom: 2px solid var(--bsDark);
+    padding: 5px;
+    height: 30px;
+}
+
+.pannelDashed td {
+    padding: 5px;
+    height: 50px;
+    border-bottom: 1px solid #bbb;
+    color: var(--bsDark);
+}

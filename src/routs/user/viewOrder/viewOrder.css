@@ -1,0 +1,99 @@
+.ordrDetails:before {
+    content: "";
+    position: fixed;
+    z-index: -1;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    background-image: url(../../../assets/background/order1.png);
+    background-position: right;
+    background-size: cover;
+    background-repeat: no-repeat;
+    opacity: 0.1;
+}
+
+.bckBtn path,
+.bckBtn i {
+    color: var(--bsWhite)
+}
+
+.addressSpanOrder {
+    max-width: 200px;
+    display: inline-block;
+}
+
+.productCardOrder {
+    background-image: linear-gradient(0deg, #e5e5e5, transparent, transparent);
+}
+
+.productCardOrder {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    padding: 5px;
+}
+
+.productCardOrder span {
+    color: var(--bsDark);
+}
+
+.prdctOrderedName {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-weight: 600;
+    max-width: 300px;
+}
+
+.total-Price {
+    background-color: #ddd;
+    background-image: none;
+    border-top: 2px solid var(--bsDark);
+}
+
+
+span.paid {
+    color: #06552f;
+    font-weight: 800;
+    text-transform: capitalize;
+}
+
+span.pending {
+    font-weight: 800;
+    color: #062f55;
+    text-transform: capitalize;
+}
+
+span.received {
+    color: #001d3d;
+    font-weight: 800;
+    text-transform: capitalize;
+}
+
+span.ready {
+    color: #78290f;
+    font-weight: 800;
+    text-transform: capitalize;
+}
+
+span.shipped {
+    color: #212529;
+    font-weight: 800;
+    text-transform: capitalize;
+}
+
+/* responsive  */
+
+
+@media(max-width:1399px) {}
+
+@media(max-width:1199px) {}
+
+@media(max-width:991px) {
+    .productCardOrder {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
+
+@media(max-width:767px) {}
+
+@media(max-width:575px) {}

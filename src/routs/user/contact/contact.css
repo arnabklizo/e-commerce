@@ -1,0 +1,131 @@
+.contacted svg path {
+    color: var(--bsWhite);
+}
+
+.contacted {
+    font-size: 20px;
+}
+
+.contactSection textarea,
+.contactSection input {
+    background-color: transparent;
+    border: none !important;
+    border-bottom: 2px solid var(--bsDark) !important;
+    outline: none !important;
+    color: var(--bsBlack);
+}
+
+.contactSection textarea {
+    height: 150px;
+    resize: none;
+}
+
+.middleContactLeft {
+    gap: 20px;
+}
+
+.mxb {
+    mix-blend-mode: exclusion;
+}
+
+.msd {
+    bottom: 100px;
+    right: 50px;
+    mix-blend-mode: exclusion;
+}
+
+.socialLinks {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--bsDark);
+    font-size: 20px;
+    margin: 10px;
+    text-decoration: none;
+}
+
+.socialLinks path {
+    color: var(--bsWhite);
+}
+
+.socialLinks:hover {
+    background-color: var(--bsWhite);
+}
+
+.socialLinks:hover path {
+    color: var(--bsBlack);
+}
+
+.contactSection:before {
+    content: "";
+    position: fixed;
+    z-index: -1;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    background-image: url(../../../assets/background/shop.png);
+    background-position: right;
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 0.2;
+}
+
+.contactBlack {
+    min-height: 380px;
+}
+
+.contLett {
+    bottom: -20px;
+    height: 150px;
+    right: 0;
+    z-index: 1;
+}
+
+.cntSubBtn {
+    position: relative;
+    z-index: 2;
+}
+
+.mapSection .container iframe {
+    width: 100%;
+    margin-bottom: -6px;
+}
+
+
+
+
+/* responsive  */
+
+
+@media(max-width:1399px) {}
+
+@media(max-width:1199px) {}
+
+@media(max-width:991px) {}
+
+@media(max-width:767px) {}
+
+@media(max-width:575px) {
+    .text-sm-center {
+        text-align: center !important;
+    }
+
+    .contacted {
+        font-size: 20px;
+        align-items: center !important;
+        justify-content: center;
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .socialContact {
+        justify-content: center;
+    }
+
+    .mapSection .container iframe {
+        height: 100vw;
+    }
+}

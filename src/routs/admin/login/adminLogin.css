@@ -1,0 +1,57 @@
+.adminLoginSect {
+    min-height: calc(100vh - 127px);
+}
+
+.adminLoginSect:before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-image: url(https://images.pexels.com/photos/1884584/pexels-photo-1884584.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1);
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    background-size: cover;
+    opacity: 0.35;
+    background-position-y: center;
+}
+
+.admnfrstDiv {
+    min-height: 300px;
+}
+
+.adminLoginImg {
+    background-image: url(https://images.pexels.com/photos/2973392/pexels-photo-2973392.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1);
+
+    background-size: cover;
+    background-position-y: center;
+}
+
+.ecl1 {
+    rotate: 90deg;
+    opacity: .5;
+}
+
+.ecl2 {
+    opacity: .5;
+    right: -30px;
+    top: 10px;
+}
+
+
+/* responsive  */
+
+
+@media(max-width:1399px) {}
+
+@media(max-width:1199px) {}
+
+@media(max-width:991px) {
+    .adminLoginSect .container>div {
+        height: auto;
+    }
+}
+
+@media(max-width:767px) {}
+
+@media(max-width:575px) {}

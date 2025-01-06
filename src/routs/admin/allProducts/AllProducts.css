@@ -1,0 +1,111 @@
+.pannelDashed .categoryTable {
+    color: #00000080;
+}
+
+.pannelDashedallPrdct td {
+    height: auto;
+}
+
+.pannelDashedallPrdct tr td:first-child div:nth-child(2) {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 210px;
+}
+
+.prductName {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-weight: 600;
+    max-width: 200px;
+    height: 30px;
+    display: block;
+}
+
+.prdctPrv {
+    width: 50px;
+    height: 50px;
+    overflow: hidden;
+}
+
+.prdctTble1s {
+    max-width: 300px;
+}
+
+.tableBtn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--bsBlack);
+    display: block;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tableBtn:hover svg path {
+    color: var(--bsWhite);
+}
+
+.editBtn:hover {
+    background-color: #1d3557
+}
+
+.prevwBtn:hover {
+    background-color: #6a994e;
+}
+
+.deltBtn:hover {
+    background-color: #9d0208;
+}
+
+
+.allProductTable {
+    min-height: 470px;
+}
+
+.addPrdct path {
+    color: var(--bsWhite);
+}
+
+.dashBoardContainer {
+    height: calc(100vh - 127px);
+    overflow-y: auto;
+}
+
+/* responsive  */
+@media(max-width:1399px) {}
+
+@media(max-width:1199px) {
+    .products .card {
+        width: 290px;
+    }
+}
+
+@media(max-width:991px) {
+    .products .card {
+        width: 325px;
+    }
+
+
+    .allProdctFiltSect {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .allProdctFiltSect h1 {
+        grid-column: 1/3;
+        grid-row: 1;
+    }
+
+    .w-300 {
+        width: 100%;
+        margin: 10px 0;
+    }
+}
+
+@media(max-width:767px) {}
+
+@media(max-width:575px) {}

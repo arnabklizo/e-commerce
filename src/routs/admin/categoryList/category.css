@@ -1,0 +1,90 @@
+.editRegisteredBtn path {
+    color: #001d3d;
+}
+
+.editRegisteredBtn:hover path {
+    color: #277da1;
+    background-color: var(--bsWhite);
+}
+
+.catPicIc {
+    width: 70px;
+    height: 70px;
+    border: 1px solid var(--baseClr);
+    box-shadow: 0px 0px 5px #000;
+    border-radius: 50%;
+    display: block;
+    overflow: hidden;
+}
+
+.catPicIc .catIconPics {
+    object-fit: cover;
+}
+
+.categoryListTable .catNamess {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-weight: 600;
+    max-width: 200px;
+    display: block;
+}
+
+.editRegister:hover path {
+    color: #e63946;
+}
+
+.categoryAddBtn path {
+    color: var(--bsWhite);
+}
+
+.dropping-area,
+.drop-area {
+    border: 2px dashed var(--bsDark);
+    padding: 20px;
+    cursor: pointer;
+    position: relative;
+}
+
+.cat-input {
+    display: none;
+}
+
+
+.image-preview {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.image-preview img {
+    max-width: 200px;
+    margin-top: 20px;
+    box-shadow: 0px 0px 5px var(--bsBlack);
+    display: none;
+}
+
+.productNumbs,
+.catNamess {
+    color: var(--bsBlack);
+}
+
+.dashBoardContainer {
+    height: calc(100vh - 127px);
+    overflow-y: auto;
+}
+
+
+
+/* responsive  */
+@media(max-width:1399px) {}
+
+@media(max-width:1199px) {}
+
+@media(max-width:991px) {}
+
+@media(max-width:767px) {}
+
+@media(max-width:575px) {}

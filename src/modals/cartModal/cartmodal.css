@@ -1,0 +1,10 @@
+.overlayed:before {
+    content: "";
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    background: #00000073;
+    top: 0;
+    left: 0;
+    z-index: 1044;
+}

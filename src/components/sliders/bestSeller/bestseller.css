@@ -1,0 +1,45 @@
+/* bestSeller */
+.bestsellerCard .productCard {
+    margin: auto;
+}
+
+.sellerButton {
+    position: absolute;
+    border: none;
+    background: transparent !important;
+    padding: 1px;
+    z-index: 99;
+    font-size: 25px;
+    top: 50%;
+    /* transform: translateY(-50%); */
+    transition: transform 0.3s ease, color 0.3s ease;
+    color: #333;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    top: 220px;
+}
+
+.sellerButton::before {
+    content: none;
+}
+
+.sellerButton:hover {
+    transform: translateY(-50%) scale(1.2);
+    color: #000;
+}
+
+.sellerButton:focus {
+    outline: none;
+}
+
+.prevSeller {
+    left: 0px;
+}
+
+.nextSeller {
+    right: 0px;
+}

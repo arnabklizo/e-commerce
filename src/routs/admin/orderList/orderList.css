@@ -1,0 +1,179 @@
+.pannelDashed td span {
+    color: var(--bsBlack);
+}
+
+.pannelDashedleft tr td:first-child {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-weight: 600;
+    max-width: 100px;
+}
+
+.pannelDashed .paid {
+    background-color: #abe7cc;
+    padding: 3px 5px;
+    color: #06552f;
+    border-radius: 3px;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.pannelDashed .pending {
+    padding: 3px 5px;
+    font-weight: 600;
+    color: #062f55;
+    text-transform: capitalize;
+    border-radius: 3px;
+    background-color: #c8c2e4;
+}
+
+.pannelDashedright tr td:first-child {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-weight: 600;
+    max-width: 300px;
+}
+
+
+
+.pannelDashedOrdrList {
+    min-height: 445px;
+}
+
+.pannelDashedOrdrList tr td:first-child div:nth-child(2) {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 210px;
+}
+
+.pannelDashed .received {
+    background-color: #84b1e0;
+    padding: 3px 5px;
+    border-radius: 3px;
+    color: #001d3d;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.pannelDashed .ready {
+    background-color: #ffab52;
+    border-radius: 3px;
+    padding: 3px 5px;
+    color: #78290f;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.pannelDashed .shipped {
+    background-color: #8d99ae;
+    padding: 3px 5px;
+    border-radius: 3px;
+    color: #212529;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+
+.selectOrder input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.selectOrder {
+    display: block;
+    position: relative;
+    cursor: pointer;
+    font-size: 20px;
+    user-select: none;
+}
+
+.orderMarker {
+    position: relative;
+    top: 0;
+    left: 0;
+    height: 1.3em;
+    width: 1.3em;
+    background-color: #ccc;
+    border-radius: 100%;
+    background: #e8e8e8;
+    box-shadow: 3px 3px 5px #c5c5c5,
+        -3px -3px 5px #ffffff;
+    transition-duration: 0.5s;
+}
+
+.selectOrder input:checked~.orderMarker {
+    box-shadow: inset 3px 3px 5px #c5c5c5,
+        inset -3px -3px 5px #ffffff;
+}
+
+.orderMarker:after {
+    content: "";
+    position: absolute;
+    opacity: 0;
+}
+
+.selectOrder input:checked~.orderMarker:after {
+    opacity: 1;
+}
+
+.selectOrder .orderMarker:after {
+    left: 0.45em;
+    top: 0.25em;
+    width: 0.25em;
+    height: 0.5em;
+    border: solid #003566;
+    border-width: 0 0.15em 0.15em 0;
+    transform: rotate(45deg);
+    box-sizing: content-box;
+}
+
+.selectAllBtn {
+    color: #457b9d;
+}
+
+.delBtn:active,
+.selectAllBtn:active {
+    border: 1px solid transparent !important;
+}
+
+.selectAllBtn:hover {
+    color: #1d2d44;
+}
+
+.delBtn {
+    font-size: 20px;
+}
+
+.delBtn:hover svg path {
+    color: #e63946;
+}
+
+.dashBoardContainer {
+    height: calc(100vh - 127px);
+    overflow-y: auto;
+}
+
+
+.pannelDashedOrdrList svg path,
+.pannelDashedOrdrList i {
+    color: var(--bsWhite)
+}
+
+/* responsive  */
+
+
+@media(max-width:1399px) {}
+
+@media(max-width:1199px) {}
+
+@media(max-width:991px) {}
+
+@media(max-width:767px) {}
+
+@media(max-width:575px) {}
