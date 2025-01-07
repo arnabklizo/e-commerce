@@ -4,7 +4,7 @@ import { addCategory } from '../../services/api';
 import { toast } from "react-toastify";
 
 
-const CategoryAdd = ({ isVisible, onClose, }) => {
+const CategoryAdd = ({ isVisible, onClose }) => {
 
     const [categoryName, setCategoryName] = useState("");
     const [categoryImage, setCategoryImage] = useState(null);

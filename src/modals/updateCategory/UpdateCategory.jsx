@@ -19,6 +19,8 @@ const UpdateCategory = ({ isVisible, onClose, category, onSave }) => {
     // Handle file input and preview
     const handleFileChange = (e) => {
         const file = e.target.files[0];
+        // console.log('Selected file:', file);
+
         if (file) {
             setFile(file);
             const reader = new FileReader();
@@ -26,56 +28,49 @@ const UpdateCategory = ({ isVisible, onClose, category, onSave }) => {
                 setImageUrl(reader.result); // Preview image
             };
             reader.readAsDataURL(file);
+        } else {
+            console.error('No file selected');
         }
     };
 
+
     // Save category details
+
     const handleSave = async (e) => {
         e.preventDefault();
         setLoading(true);
 
         try {
-            let uploadedImageUrl = imageUrl; // Keep the existing image URL initially.
+            let uploadedImageUrl = imageUrl;
 
-            // Check if a new file has been selected
+            // If a new image file is selected, upload it to Cloudinary
             if (file) {
                 const formData = new FormData();
-                formData.append('file', file);  // Attach the file to the formData
-                formData.append('upload_preset', 'ml_default'); // Your Cloudinary upload preset
-                // Debugging: Log the file and FormData
-                console.log('File being uploaded:', file);
-                console.log('FormData being sent:', formData);
+                formData.append('file', file);
+                formData.append('upload_preset', 'ml_default'); // Update to your Cloudinary preset
 
-                // Cloudinary image upload request
+                // Upload image to Cloudinary
                 const response = await fetch('https://api.cloudinary.com/v1_1/ddjjlvsdi/image/upload', {
                     method: 'POST',
                     body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',  // Commonly used for CORS handling
-                    },
                 });
 
-                // If the request fails
                 if (!response.ok) {
+                    console.error('Failed to upload image. Status:', response.status, await response.text());
                     throw new Error('Failed to upload image to Cloudinary');
                 }
 
-                // Parse the response and get the URL of the uploaded image
                 const data = await response.json();
-
-                // Debugging: Log the response from Cloudinary
-                console.log('Cloudinary response:', data);
-
-
-                // If there's an error with Cloudinary's response
+                // console.log("Cloudinary Response:", data);
                 if (!data.secure_url) {
+                    console.error('Cloudinary response does not contain secure_url:', data)
                     throw new Error('Image URL not returned by Cloudinary');
                 }
 
-                uploadedImageUrl = data.secure_url; // Set the image URL to the newly uploaded image's URL
+                uploadedImageUrl = data.secure_url; // Use the new Cloudinary image URL
             }
 
-            // Pass updated data (including the image URL) to the parent component
+            // Pass the updated category details to the parent component
             onSave({ ...category, name, imageUrl: uploadedImageUrl });
             onClose();
         } catch (error) {
@@ -85,6 +80,9 @@ const UpdateCategory = ({ isVisible, onClose, category, onSave }) => {
             setLoading(false);
         }
     };
+
+
+
 
     const handleModalClose = (e) => {
         if (e.target.id === 'updateCategory') {

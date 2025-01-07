@@ -10,13 +10,16 @@ import { getCategories } from '../../../services/api';
 const Categories = () => {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [count, setCount] = useState(0); // Add a state for category count
+
     useEffect(() => {
         const fetchCategories = async () => {
             setLoading(true);
             try {
                 const response = await getCategories();
-                setCategories(response.data);
-                console.log(response.data)
+                setCategories(response.data.categories);
+                // console.log(response.data.categories)
+                setCount(response.data.count)
             } catch (error) {
                 console.error('Failed to fetch categories:', error);
             } finally {

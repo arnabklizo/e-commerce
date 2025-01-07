@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Tooltip } from 'bootstrap';
 import { Link } from 'react-router-dom';
+import { addCategory } from '../../../services/api';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import CategoryAdd from '../../../modals/categoryModal/CategoryAdd';
@@ -42,14 +43,16 @@ const CategoryList = () => {
     };
 
 
+
     const handleSaveCategory = async (updatedCategory) => {
         try {
+            // console.log('updatedCategory:', updatedCategory)
             const response = await axios.put(
                 `http://localhost:5000/api/admin/categories/${updatedCategory._id}`,
                 updatedCategory
             );
 
-            console.log('Category updated:', response.data);
+            // console.log('Category updated:', response.data);
 
             // Update categories in state
             setCategories((prevCategories) =>
@@ -72,29 +75,26 @@ const CategoryList = () => {
     const [count, setCount] = useState(0); // Add a state for category count
     const navigate = useNavigate();
 
+    const fetchCategories = async () => {
+        setLoading(true);
+        try {
+            const response = await getCategories();
+            setCategories(response.data.categories);
+            setCount(response.data.count)
+        } catch (error) {
+            console.error('Failed to fetch categories:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
     // Fetch categories from the backend
-    useEffect(() => {
-        const fetchCategories = async () => {
-            setLoading(true);
-            try {
-                const response = await getCategories();
-                setCategories(response.data.categories);
-                setCount(response.data.count)
-            } catch (error) {
-                console.error('Failed to fetch categories:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchCategories();
-    }, []);
+    useEffect(() => { fetchCategories(); }, []);
 
     // delete data
     const deleteCategory = async (id) => {
         if (window.confirm('Are you sure you want to delete this category?')) {
             try {
-                console.log('Sending DELETE request for category ID:', id);
+                // console.log('Sending DELETE request for category ID:', id);
                 const response = await axios.delete(`http://localhost:5000/api/admin/categories/${id}`);
                 // console.log('Delete response:', response.data);
                 setCategories(categories.filter((category) => category._id !== id));
@@ -129,7 +129,7 @@ const CategoryList = () => {
 
     const onCloseModal = () => {
         toggleCategoryModal();
-        // reloadPage();
+        fetchCategories();
     }
 
     const SearchBar = () => (
