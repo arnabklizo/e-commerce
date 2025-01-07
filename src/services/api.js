@@ -35,6 +35,7 @@ export const logoutUser = () => API.post("/auth/logout"); // Logout user
 export const loginAdmin = (data) => API.post("/admin/login", data); // Login admin (requires email and password)
 export const logoutAdmin = () => API.post("/admin/logout"); // Logout admin 
 export const addCategory = (data) => API.post("/admin/categories", data, { headers: { "Content-Type": "multipart/form-data" } });
+export const getCategories = () => API.get("/admin/categories");
 
 
 // Optionally add token to headers for authenticated routes

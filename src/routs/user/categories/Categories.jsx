@@ -1,11 +1,37 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from "react-router-dom";
-import { Icon } from '../../../constans/icon';
 import './categories.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLeftLong } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
+import { getCategories } from '../../../services/api';
+
+
 const Categories = () => {
+    const [categories, setCategories] = useState([]);
+    const [loading, setLoading] = useState(true);
+    useEffect(() => {
+        const fetchCategories = async () => {
+            setLoading(true);
+            try {
+                const response = await getCategories();
+                setCategories(response.data);
+                console.log(response.data)
+            } catch (error) {
+                console.error('Failed to fetch categories:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCategories();
+    }, []);
+
+
+
+
+
+    // front 
     const navigate = useNavigate();
 
     const goBack = () => {
@@ -13,14 +39,7 @@ const Categories = () => {
     };
 
 
-    const categories = [
-        { imageSrc: 'Icon.cat1', catName: "Men's T-Shirt", inStock: 38 },
-        { imageSrc: 'Icon.cat1', catName: "Men's T-Shirt", inStock: 38 },
-        { imageSrc: 'Icon.cat1', catName: "Men's T-Shirt", inStock: 38 },
-        { imageSrc: 'Icon.cat1', catName: "Men's T-Shirt", inStock: 38 },
-        { imageSrc: 'Icon.cat1', catName: "Men's T-Shirt", inStock: 38 },
-        { imageSrc: 'Icon.cat1', catName: "Men's T-Shirt", inStock: 38 },
-    ]
+
     return (
         <>
             {/* <!-- main  --> */}
@@ -34,13 +53,13 @@ const Categories = () => {
 
                     <div className="categoriesBox my-3 p-2">
                         <div className="categoryDiv d-flex flex-wrap justify-content-center">
-                            {categories.map(((cat, index) => (
-                                <Link to="/showroducts" className="categories text-decoration-none m-2" key={index}>
+                            {categories.map(((category) => (
+                                <Link to="/showroducts" className="categories text-decoration-none m-2" key={category._id}>
                                     <div className="card" >
-                                        <img src={Icon.cat1} className="card-img-top" alt="..." />
+                                        <img src={category.imageUrl} className="card-img-top" alt="..." />
                                         <div className="card-body">
-                                            <h5 className="card-title">{cat.catName}</h5>
-                                            <p className="card-text">{cat.inStock} Items</p>
+                                            <h5 className="card-title">{category.name}</h5>
+                                            <p className="card-text">{category.itemCount} Items</p>
                                         </div>
                                     </div>
                                 </Link>

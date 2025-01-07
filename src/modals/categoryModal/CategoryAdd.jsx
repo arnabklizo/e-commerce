@@ -4,7 +4,8 @@ import { addCategory } from '../../services/api';
 import { toast } from "react-toastify";
 
 
-const CategoryAdd = ({ isVisible, onClose }) => {
+const CategoryAdd = ({ isVisible, onClose, }) => {
+
     const [categoryName, setCategoryName] = useState("");
     const [categoryImage, setCategoryImage] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -65,7 +66,10 @@ const CategoryAdd = ({ isVisible, onClose }) => {
             toast.success("Category uploaded successfully!");
             setCategoryName("");
             setCategoryImage(null);
-            onClose()
+            onClose();
+            const previewElement = document.getElementById("cat-preview");
+            previewElement.innerHTML = ``;
+
         } catch (error) {
             console.log(error)
             toast.error(
@@ -93,6 +97,7 @@ const CategoryAdd = ({ isVisible, onClose }) => {
         }
     };
 
+    // if (!isVisible) return null;
     return (
         <div
             className={`modal fade ${isVisible ? 'show' : ''}`}
