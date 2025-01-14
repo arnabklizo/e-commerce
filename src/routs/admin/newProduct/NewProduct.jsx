@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import ReactQuill from 'react-quill';
-import CategoryAdd from '../../../modals/categoryModal/CategoryAdd';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashCan, faLeftLong, faCirclePlus } from '@fortawesome/free-solid-svg-icons';
+import { faTrashCan, faLeftLong } from '@fortawesome/free-solid-svg-icons';
 import 'react-quill/dist/quill.snow.css';
 import '../newProduct/newProduct.css';
+import { getCategories } from '../../../services/api';
+import { addProduct } from '../../../services/api';
+import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-toastify';
 
 // Reusable InputField Component
 const InputField = ({
@@ -40,6 +43,35 @@ const InputField = ({
 };
 
 const NewProduct = () => {
+    const [formData, setFormData] = useState({
+        productName: '',
+        productDescription: '',
+        productStock: '',
+        productPrice: '',
+        discountPrice: '',
+        productFor: '',
+        productFeatures: [],
+        categories: '',
+        images: [],
+    });
+    const [newFeature, setNewFeature] = useState('');
+    const [categories, setCategories] = useState([]);
+    const [loading, setLoading] = useState(true);
+    useEffect(() => {
+        const fetchCategories = async () => {
+            setLoading(true);
+            try {
+                const response = await getCategories();
+                setCategories(response.data.categories);
+            } catch (error) {
+                console.error('Failed to fetch categories:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCategories();
+    }, []);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -51,21 +83,75 @@ const NewProduct = () => {
     }, [navigate]);
 
 
+    useEffect(() => {
+        const token = Cookies.get('adminToken');
+        if (!token) {
+            navigate("/adminLogin");
+        }
+    }, [navigate]);
 
-    const [isVisibleCat, setVisibleCat] = useState(false);
-    const [editorHtml, setEditorHtml] = useState('');
-    const [formData, setFormData] = useState({
-        productName: '',
-        productDescription: '',
-        productStock: '',
-        productPrice: '',
-        discountPrice: '',
-        productFor: '',
-        productFeatures: [],
-        categories: '',
-        images: [], // For storing the uploaded images
-    });
-    const [newFeature, setNewFeature] = useState(''); // To store the current feature input
+    useEffect(() => {
+        const fetchCategories = async () => {
+            setLoading(true);
+            try {
+                const response = await getCategories();
+                setCategories(response.data.categories);
+            } catch (error) {
+                console.error('Failed to fetch categories:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCategories();
+    }, []);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const form = new FormData();
+        form.append("productName", formData.productName);
+        form.append("productDescription", formData.productDescription);
+        form.append("productStock", formData.productStock || 0);
+        form.append("productPrice", formData.productPrice);
+        form.append("discountPrice", formData.discountPrice || 0);
+        form.append("productFor", formData.productFor);
+        form.append("categories", formData.categories);
+        form.append("productFeatures", JSON.stringify(formData.productFeatures));
+
+        formData.images.forEach((image) => {
+            form.append("images", image);
+        });
+
+        try {
+            setLoading(true);
+            const response = await addProduct(form);
+            toast.success("Product added successfully!");
+            setFormData({
+                productName: '',
+                productDescription: '',
+                productStock: '',
+                productPrice: '',
+                discountPrice: '',
+                productFor: '',
+                productFeatures: [],
+                categories: '',
+                images: [],
+            });
+            navigate("/allProducts");
+        } catch (error) {
+            console.error("Error adding product:", error);
+            toast.error(error.response.data.error);
+            setLoading(true);
+        }
+    };
+
+    const handleDescriptionChange = (content, delta, source, editor) => {
+        setFormData((prev) => ({
+            ...prev,
+            productDescription: content,
+        }));
+    };
+
 
     // Generic handler for form input change
     const handleChange = (e) => {
@@ -137,10 +223,6 @@ const NewProduct = () => {
         }));
     };
 
-
-    const toggleVissibleCat = () => (
-        setVisibleCat(!isVisibleCat)
-    )
     return (
         <section className="addednewProduct position-relative">
             <div className="container">
@@ -148,7 +230,7 @@ const NewProduct = () => {
                     Add New Product
                 </h1>
 
-                <form className="rounded border newProduct p-3 mb-3">
+                <form className="rounded border newProduct p-3 mb-3" onSubmit={handleSubmit}>
                     <div className="row">
                         {/* Left Column */}
                         <div className="col-12 col-lg-6">
@@ -160,15 +242,19 @@ const NewProduct = () => {
                                 value={formData.productName}
                                 onChange={handleChange}
                                 name="productName"
+                                required
                             />
                             <div className="mb-3">
                                 <label htmlFor="productDescription" className="form-label">Product Description</label>
                                 <div id="editor-container" className='border rounded bg-white overflow-hidden'>
-                                    <ReactQuill
-                                        value={editorHtml}
-                                        onChange={setEditorHtml}
-                                        modules={{ toolbar: [['bold', 'italic', 'underline']] }}
-                                    />
+                                    <React.StrictMode>
+                                        <ReactQuill
+                                            value={formData.productDescription}
+                                            onChange={handleDescriptionChange}
+                                            modules={{ toolbar: [['bold', 'italic', 'underline']] }}
+                                        />
+                                    </React.StrictMode>
+
                                 </div>
                             </div>
                             <InputField
@@ -179,6 +265,7 @@ const NewProduct = () => {
                                 value={formData.productStock}
                                 onChange={handleChange}
                                 name="productStock"
+                                required
                             />
                             <div className="fw-bolder text-dark fs-5 mb-3">Image</div>
                             <div className="upload-container">
@@ -229,6 +316,7 @@ const NewProduct = () => {
                                 value={formData.productPrice}
                                 onChange={handleChange}
                                 name="productPrice"
+                                required
                             />
                             <InputField
                                 id="discountPriceOfProduct"
@@ -238,6 +326,7 @@ const NewProduct = () => {
                                 value={formData.discountPrice}
                                 onChange={handleChange}
                                 name="discountPrice"
+
                             />
                             <div className="fw-bolder text-dark fs-5 mb-3">Product For</div>
                             <InputField
@@ -247,6 +336,7 @@ const NewProduct = () => {
                                 value={formData.productFor}
                                 onChange={handleChange}
                                 name="productFor"
+                                required
                             >
                                 <option value="" disabled>Open this select menu</option>
                                 <option value="men">Men</option>
@@ -267,7 +357,7 @@ const NewProduct = () => {
                                     id="itemInput"
                                     placeholder="Enter key point here"
                                     value={newFeature}
-                                    onChange={(e) => setNewFeature(e.target.value)} // Update feature input
+                                    onChange={(e) => setNewFeature(e.target.value)}
                                 />
                             </div>
                             <ul id="listBox" className="list-unstyled keyPointList">
@@ -286,29 +376,28 @@ const NewProduct = () => {
                             </ul>
 
                             <div className="fw-bolder text-dark fs-5 mb-3">Categories</div>
-                            <InputField
-                                as="select"
-                                id="categories"
-                                label="Categories"
-                                value={formData.categories}
-                                onChange={handleChange}
+
+
+                            <select
+                                className='form-select mb-4'
                                 name="categories"
+                                value={formData.categories}
+                                defaultValue=""
+                                onChange={(e) =>
+                                    setFormData({ ...formData, categories: e.target.value })
+                                }
+                                required
                             >
                                 <option value="" disabled>Open this select menu</option>
-                                <option value="dress">Dress</option>
-                                <option value="bag">Bag</option>
-                                <option value="glasses">Glasses</option>
-                                <option value="shoe">Shoe</option>
-                            </InputField>
 
-                            <button
-                                className="categoryAddBtn btn btn-dark d-flex align-items-center fs-5 fw-bold mb-3"
-                                type="button"
-                                onClick={toggleVissibleCat}
-                            >
-                                <FontAwesomeIcon icon={faCirclePlus} className='me-2' />
-                                Add Category
-                            </button>
+                                {categories.map((category) => (
+                                    <option key={category._id} value={category._id}>
+                                        {category.name}
+                                    </option>
+                                ))}
+                            </select>
+
+
                         </div>
                     </div>
 
@@ -329,10 +418,6 @@ const NewProduct = () => {
                     </button>
                 </div>
             </div>
-            <CategoryAdd
-                isVisible={isVisibleCat}
-                onClose={toggleVissibleCat}
-            />
         </section>
     );
 };

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { Icon } from '../../../constans/icon';
 import { Tooltip } from 'bootstrap';
 import { Link } from 'react-router-dom';
-import { addCategory } from '../../../services/api';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import CategoryAdd from '../../../modals/categoryModal/CategoryAdd';
@@ -20,11 +20,10 @@ import {
     faArrowLeft,
     faArrowRight,
 } from '@fortawesome/free-solid-svg-icons';
-import { getCategories } from '../../../services/api'
+import { getCategories, delCategory, updateCategory } from '../../../services/api'
 import '../categoryList/category.css';
 import 'react-toastify/dist/ReactToastify.css';
-
-import axios from 'axios';
+import { toast } from 'react-toastify';
 
 // toast.configure();
 
@@ -32,49 +31,36 @@ import axios from 'axios';
 const CategoryList = () => {
     const [isEditModalVisible, setEditModalVisible] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState(null);
-    const openEditModal = (category) => {
-        setSelectedCategory(category);
-        setEditModalVisible(true);
-    };
+    const [categories, setCategories] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [isVisibleCat, setVisibleCat] = useState(false);
+    const [count, setCount] = useState(0);
 
-    const closeEditModal = () => {
-        setEditModalVisible(false);
-        setSelectedCategory(null);
-    };
+    const navigate = useNavigate();
 
-
-
+    //update Category
     const handleSaveCategory = async (updatedCategory) => {
         try {
-            // console.log('updatedCategory:', updatedCategory)
-            const response = await axios.put(
-                `http://localhost:5000/api/admin/categories/${updatedCategory._id}`,
-                updatedCategory
-            );
-
-            // console.log('Category updated:', response.data);
-
+            setLoading(true);
+            const response = await updateCategory(updatedCategory)
             // Update categories in state
             setCategories((prevCategories) =>
                 prevCategories.map((cat) =>
                     cat._id === updatedCategory._id ? response.data.category : cat
                 )
             );
-
-            // Close modal after success
+            toast.success('Category updated Successfully .!')
             closeEditModal();
+            setLoading(false)
         } catch (error) {
             console.error('Error updating category:', error);
-            alert('Failed to update category. Please try again.');
+            toast.error('Failed to update category. Please try again.');
+            setLoading(false)
         }
     };
 
-    const [categories, setCategories] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [isVisibleCat, setVisibleCat] = useState(false);
-    const [count, setCount] = useState(0); // Add a state for category count
-    const navigate = useNavigate();
 
+    //fetch Category
     const fetchCategories = async () => {
         setLoading(true);
         try {
@@ -84,25 +70,27 @@ const CategoryList = () => {
         } catch (error) {
             console.error('Failed to fetch categories:', error);
         } finally {
-            setLoading(false);
+            setLoading(false)
         }
     };
+
     // Fetch categories from the backend
     useEffect(() => { fetchCategories(); }, []);
 
-    // delete data
+    // delete category
     const deleteCategory = async (id) => {
         if (window.confirm('Are you sure you want to delete this category?')) {
+            setLoading(true)
             try {
-                // console.log('Sending DELETE request for category ID:', id);
-                const response = await axios.delete(`http://localhost:5000/api/admin/categories/${id}`);
-                // console.log('Delete response:', response.data);
+                await delCategory(id);
                 setCategories(categories.filter((category) => category._id !== id));
+                setLoading(false);
+                toast.success('Category deleted Successfully .!')
             } catch (error) {
                 console.error('Failed to delete category:', error);
-
                 console.log(error.message)
-                alert('Error deleting category. Please try again.');
+                toast.error('Error deleting category. Please try again.');
+                setLoading(false);
             }
         }
     };
@@ -115,6 +103,10 @@ const CategoryList = () => {
         }
     }, [navigate]);
 
+
+
+    // back end code ends here 
+
     // Initialize tooltips
     useEffect(() => {
         const tooltips = Array.from(document.querySelectorAll('[data-bs-toggle="tooltip"]')).map(
@@ -123,7 +115,15 @@ const CategoryList = () => {
         return () => tooltips.forEach((tooltip) => tooltip.dispose());
     }, []);
 
+    const openEditModal = (category) => {
+        setSelectedCategory(category);
+        setEditModalVisible(true);
+    };
 
+    const closeEditModal = () => {
+        setEditModalVisible(false);
+        setSelectedCategory(null);
+    };
 
     const toggleCategoryModal = () => { setVisibleCat((prev) => !prev); }
 
@@ -255,7 +255,11 @@ const CategoryList = () => {
                     </button>
                 </div>
                 {loading ? (
-                    <p>Loading categories...</p>
+                    <div className='d-flex align-items-center justify-content-center flex-column h-100'>
+                        <img src={Icon.loaderOne} alt="" />
+                        <p className='mt-2'>Loading categories...</p>
+                    </div>
+
                 ) : count === 0 ? (
                     <p className='text-center pt-3'>No categories available.</p>
                 ) : (

@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLeftLong } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import { getCategories } from '../../../services/api';
+import { toast } from "react-toastify";
 
 
 const Categories = () => {

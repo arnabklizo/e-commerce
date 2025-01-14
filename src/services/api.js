@@ -34,8 +34,20 @@ export const logoutUser = () => API.post("/auth/logout"); // Logout user
 // Admin Authentication
 export const loginAdmin = (data) => API.post("/admin/login", data); // Login admin (requires email and password)
 export const logoutAdmin = () => API.post("/admin/logout"); // Logout admin 
+
+// for category
 export const addCategory = (data) => API.post("/admin/categories", data, { headers: { "Content-Type": "multipart/form-data" } });
 export const getCategories = () => API.get("/admin/categories");
+export const delCategory = (id) => API.delete(`/admin/categories/${id}`);
+export const updateCategory = (data) => API.put(`/admin/categories/${data._id}`, data);
+
+//for product
+export const addProduct = (data) => API.post("/products/addProduct", data, { headers: { "Content-Type": "multipart/form-data" } });
+export const getAllProducts = () => API.get("/products");
+export const delProduct = (id) => API.delete(`/products/${id}`);
+
+
+
 
 
 // Optionally add token to headers for authenticated routes

@@ -13,6 +13,9 @@ import cat5 from '../assets/icon/catIc5.png';
 import cat6 from '../assets/icon/catIc6.png';
 import cat7 from '../assets/icon/catIc7.png';
 import cat8 from '../assets/icon/catIc8.png';
+import loaderOne from '../assets/icon/ajax-loader.gif'
+import loader from '../assets/icon/loader.gif'
+
 
 export const Icon = {
     logo,
@@ -29,6 +32,8 @@ export const Icon = {
     cat5,
     cat6,
     cat7,
-    cat8
+    cat8,
+    loaderOne,
+    loader
 }
 

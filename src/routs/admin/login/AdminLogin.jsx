@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { loginAdmin } from "../../../services/api";
 import { background } from '../../../constans/background';
@@ -16,6 +16,14 @@ const AdminLogin = () => {
     const [showPassword, setShowPassword] = useState(false);
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        // Redirect to dashboard if already logged in
+        const token = Cookies.get("adminToken");
+        if (token) {
+            navigate("/dashboard");
+        }
+    }, [navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

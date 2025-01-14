@@ -29,6 +29,11 @@
     overflow: hidden;
 }
 
+.prdctPrv img {
+    object-fit: cover;
+    height: 100%;
+}
+
 .prdctTble1s {
     max-width: 300px;
 }

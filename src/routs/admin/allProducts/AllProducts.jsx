@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Tooltip } from "bootstrap";
-import { product } from '../../../constans/product';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -19,11 +18,53 @@ import {
     faArrowLeft,
     faArrowRight
 } from '@fortawesome/free-solid-svg-icons';
-
+import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-toastify';
+import { getAllProducts, delProduct } from '../../../services/api';
 import TimeNow from '../../../components/timer/TimeNow';
 import '../allProducts/AllProducts.css';
 
 const AllProducts = () => {
+    const [loading, setLoading] = useState(true);
+    const [products, setProducts] = useState([]);
+
+    // fetch products 
+    const fetchProducts = async () => {
+        setLoading(true);
+        try {
+            const response = await getAllProducts();
+            setProducts(response.data.products);
+        } catch (error) {
+            console.error('Failed to fetch products:', error);
+            toast.error('Failed to fetch products');
+        } finally {
+            setLoading(false);
+        }
+    };
+    // Fetch products from the backend
+    useEffect(() => { fetchProducts(); }, []);
+
+
+    //delete Product
+    const deleteProduct = async (id) => {
+        console.log(id)
+        if (window.confirm('Are you sure you want to delete this category?')) {
+            try {
+                setLoading(true);
+                await delProduct(id);
+                setProducts(products.filter((product) => product._id !== id));
+                toast.success('Product deleted !!');
+                setLoading(false);
+            } catch (error) {
+                console.error('Failed to delete category:', error);
+                console.log(error.message);
+                toast.error('Error deleting category. Please try again.');
+                setLoading(false);
+            }
+        }
+    };
+
+    // back 
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -37,6 +78,10 @@ const AllProducts = () => {
 
 
     const [selectedCategory, setSelectedCategory] = useState('all');
+    // Handler for category selection change
+    const handleCategoryChange = (event) => {
+        setSelectedCategory(event.target.value);
+    };
 
     useEffect(() => {
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
@@ -49,14 +94,6 @@ const AllProducts = () => {
         };
     }, []);
 
-    const products = [
-        { name: 'Men Yellow Hoodie', category: 'Dress', inStock: 96, price: 1599, avgRate: 5.0, vote: 32 },
-        { name: 'Men Grey Hoodie', category: 'Dress', inStock: 70, price: 699, avgRate: 5.0, vote: 45 },
-        { name: 'Women Striped T-Shirt', category: 'T-Shirt', inStock: 56, price: 599, avgRate: 4.0, vote: 22 },
-        { name: 'Women White T- Shirt', category: 'T-Shirt', inStock: 123, price: 1799, avgRate: 4.5, vote: 39 },
-        { name: 'Women Red T-Shirt', category: 'T-Shirt', inStock: 45, price: 799, avgRate: 5.0, vote: 98 },
-    ];
-
     const SortButton = ({ ascIcon, descIcon }) => (
         <button className="sortButton border-0 bg-transparent mx-1">
             <span className="asc d-none">
@@ -68,31 +105,19 @@ const AllProducts = () => {
         </button>
     );
 
-    const ProductInfo = ({ name, category }) => (
+    const ProductInfo = ({ imageSrc, name, useFor }) => (
         <div className="d-flex align-items-center productInfo">
             <div className="prdctPrv border me-1">
-                <img src={product.hoodie} alt={`${name} preview`} className="w-100" />
+                <img src={imageSrc} alt={`${name} preview`} className="w-100" />
             </div>
             <div>
                 <span className="productName fw-bold">{name}</span>
-                <div className="category fw-bold">{category}</div>
+                <div className="category fw-bold text-capitalize">{useFor}</div>
             </div>
         </div>
     );
 
-    const ActionButtons = () => (
-        <div className="d-flex">
-            <Link to="#" className="editBtn tableBtn m-1" data-bs-title="Edit Product" data-bs-toggle="tooltip" data-bs-placement="bottom">
-                <FontAwesomeIcon icon={faPencil} />
-            </Link>
-            <Link to="/previewProduct" className="prevwBtn tableBtn m-1" data-bs-title="Preview Product" data-bs-toggle="tooltip" data-bs-placement="bottom">
-                <FontAwesomeIcon icon={faEye} />
-            </Link>
-            <button className="deltBtn tableBtn m-1" data-bs-title="Delete Product" data-bs-toggle="tooltip" data-bs-placement="bottom">
-                <FontAwesomeIcon icon={faTrashCan} />
-            </button>
-        </div>
-    );
+
 
     const ProductLists = () => (
         <table className="w-100">
@@ -100,20 +125,32 @@ const AllProducts = () => {
                 <tr>
                     <th>Product <SortButton ascIcon={faArrowDownAZ} descIcon={faArrowDownZA} /></th>
                     <th>Inventory <SortButton ascIcon={faArrowDownWideShort} descIcon={faArrowDownShortWide} /></th>
-                    <th>Color</th>
                     <th>Price <SortButton ascIcon={faArrowDownWideShort} descIcon={faArrowDownShortWide} /></th>
                     <th>Rating</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
-                {products.map((item, index) => (
-                    <tr key={index}>
-                        <td><ProductInfo name={item.name} category={item.category} /></td>
-                        <td>{item.inStock} in stock</td>
-                        <td>&#8377;<span className="ammountTable">{item.price}</span></td>
-                        <td>{item.avgRate} ({item.vote} Votes)</td>
-                        <td><ActionButtons /></td>
+                {products.map((product) => (
+                    <tr key={product._id}>
+                        <td><ProductInfo imageSrc={product.imageUrl[0]} name={product.name} useFor={product.productFor} /></td>
+                        <td>{product.inStock} in stock</td>
+                        <td>&#8377;<span className="ammountTable">{product.price}</span></td>
+                        {/* <td>{item.avgRate} ({item.vote} Votes)</td> */}
+                        <td>5.0 (4.8 Votes)</td>
+                        <td>
+                            <div className="d-flex">
+                                <Link to="#" className="editBtn tableBtn m-1" data-bs-title="Edit Product" data-bs-toggle="tooltip" data-bs-placement="bottom">
+                                    <FontAwesomeIcon icon={faPencil} />
+                                </Link>
+                                <Link to="/previewProduct" className="prevwBtn tableBtn m-1" data-bs-title="Preview Product" data-bs-toggle="tooltip" data-bs-placement="bottom">
+                                    <FontAwesomeIcon icon={faEye} />
+                                </Link>
+                                <button className="deltBtn tableBtn m-1" data-bs-title="Delete Product" data-bs-toggle="tooltip" data-bs-placement="bottom" onClick={() => deleteProduct(product._id)}>
+                                    <FontAwesomeIcon icon={faTrashCan} />
+                                </button>
+                            </div>
+                        </td>
                     </tr>
                 ))}
             </tbody>
@@ -180,10 +217,6 @@ const AllProducts = () => {
     );
 
 
-    // Handler for category selection change
-    const handleCategoryChange = (event) => {
-        setSelectedCategory(event.target.value);
-    };
 
 
 
