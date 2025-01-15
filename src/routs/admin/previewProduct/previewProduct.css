@@ -2,6 +2,9 @@
     gap: 5px;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
+    max-width: 500px;
+    position: sticky;
+    top: 90px;
 }
 
 .productSingleImg div:first-child {
@@ -13,6 +16,8 @@
 
 .productSingleImg img {
     transition: all 0.2s linear;
+    object-fit: cover;
+    height: 100%;
 }
 
 .productSingleImg img:hover {
@@ -34,11 +39,7 @@
     color: #15616d;
 }
 
-.productSingleImg {
-    max-width: 500px;
-    position: sticky;
-    top: 90px;
-}
+
 
 .prevProductSect {
     min-height: calc(100vh - 126px);

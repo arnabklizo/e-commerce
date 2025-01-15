@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Icon } from '../../../constans/icon';
+import Loader from '../../../components/loader/loader';
 import { Tooltip } from 'bootstrap';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
@@ -255,10 +255,7 @@ const CategoryList = () => {
                     </button>
                 </div>
                 {loading ? (
-                    <div className='d-flex align-items-center justify-content-center flex-column h-100'>
-                        <img src={Icon.loaderOne} alt="" />
-                        <p className='mt-2'>Loading categories...</p>
-                    </div>
+                    <Loader itemName={'Loading categories'} />
 
                 ) : count === 0 ? (
                     <p className='text-center pt-3'>No categories available.</p>
@@ -266,8 +263,12 @@ const CategoryList = () => {
                     <CategoryTable />
                 )}
             </div>
-
-            <FooterPagination />
+            <div className="d-flex border rounded align-items-center justify-content-between p-2 px-3 mt-3 bg-light mb-2">
+                <div className="productNumbers text-dark fw-bolder">
+                    <span className="fw-bold">{count}</span> Categories
+                </div>
+                <FooterPagination />
+            </div>
             <CategoryAdd isVisible={isVisibleCat} onClose={onCloseModal} />
             <UpdateCategory
                 isVisible={isEditModalVisible}

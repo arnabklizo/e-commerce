@@ -43,8 +43,9 @@ export const updateCategory = (data) => API.put(`/admin/categories/${data._id}`,
 
 //for product
 export const addProduct = (data) => API.post("/products/addProduct", data, { headers: { "Content-Type": "multipart/form-data" } });
-export const getAllProducts = () => API.get("/products");
+export const getAllProducts = () => API.get(`/products`);
 export const delProduct = (id) => API.delete(`/products/${id}`);
+export const getProduct = (id) => API.get(`/products/${id}`);
 
 
 

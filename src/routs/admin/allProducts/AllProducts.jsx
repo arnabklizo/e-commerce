@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import Loader from '../../../components/loader/loader';
 import { Tooltip } from "bootstrap";
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
@@ -20,13 +21,30 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import 'react-toastify/dist/ReactToastify.css';
 import { toast } from 'react-toastify';
-import { getAllProducts, delProduct } from '../../../services/api';
+import { getAllProducts, delProduct, getCategories } from '../../../services/api';
 import TimeNow from '../../../components/timer/TimeNow';
 import '../allProducts/AllProducts.css';
+
+
 
 const AllProducts = () => {
     const [loading, setLoading] = useState(true);
     const [products, setProducts] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [count, setCount] = useState(0);
+
+    //fetch categories 
+    const fetchCategories = async () => {
+        setLoading(true);
+        try {
+            const response = await getCategories();
+            setCategories(response.data.categories);
+        } catch (error) {
+            console.error('Failed to fetch categories:', error);
+        } finally {
+            setLoading(false)
+        }
+    };
 
     // fetch products 
     const fetchProducts = async () => {
@@ -34,6 +52,8 @@ const AllProducts = () => {
         try {
             const response = await getAllProducts();
             setProducts(response.data.products);
+            setCount(response.data.count);
+
         } catch (error) {
             console.error('Failed to fetch products:', error);
             toast.error('Failed to fetch products');
@@ -42,7 +62,7 @@ const AllProducts = () => {
         }
     };
     // Fetch products from the backend
-    useEffect(() => { fetchProducts(); }, []);
+    useEffect(() => { fetchProducts(); fetchCategories() }, []);
 
 
     //delete Product
@@ -53,7 +73,7 @@ const AllProducts = () => {
                 setLoading(true);
                 await delProduct(id);
                 setProducts(products.filter((product) => product._id !== id));
-                toast.success('Product deleted !!');
+                toast.success('Product deleted successfully !!');
                 setLoading(false);
             } catch (error) {
                 console.error('Failed to delete category:', error);
@@ -92,7 +112,7 @@ const AllProducts = () => {
         return () => {
             tooltips.forEach((tooltip) => tooltip.dispose());
         };
-    }, []);
+    }, [products]);
 
     const SortButton = ({ ascIcon, descIcon }) => (
         <button className="sortButton border-0 bg-transparent mx-1">
@@ -117,8 +137,6 @@ const AllProducts = () => {
         </div>
     );
 
-
-
     const ProductLists = () => (
         <table className="w-100">
             <thead>
@@ -133,17 +151,23 @@ const AllProducts = () => {
             <tbody>
                 {products.map((product) => (
                     <tr key={product._id}>
-                        <td><ProductInfo imageSrc={product.imageUrl[0]} name={product.name} useFor={product.productFor} /></td>
+                        <td><ProductInfo imageSrc={product.imageUrl[0]} name={product.name} useFor={product.category.name} /></td>
                         <td>{product.inStock} in stock</td>
                         <td>&#8377;<span className="ammountTable">{product.price}</span></td>
                         {/* <td>{item.avgRate} ({item.vote} Votes)</td> */}
                         <td>5.0 (4.8 Votes)</td>
                         <td>
                             <div className="d-flex">
-                                <Link to="#" className="editBtn tableBtn m-1" data-bs-title="Edit Product" data-bs-toggle="tooltip" data-bs-placement="bottom">
+                                <Link
+                                    to="#"
+                                    className="editBtn tableBtn m-1"
+                                    data-bs-title="Edit Product"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="bottom"
+                                >
                                     <FontAwesomeIcon icon={faPencil} />
                                 </Link>
-                                <Link to="/previewProduct" className="prevwBtn tableBtn m-1" data-bs-title="Preview Product" data-bs-toggle="tooltip" data-bs-placement="bottom">
+                                <Link to={`/previewProduct/${product._id}`} className="prevwBtn tableBtn m-1" data-bs-title="Preview Product" data-bs-toggle="tooltip" data-bs-placement="bottom">
                                     <FontAwesomeIcon icon={faEye} />
                                 </Link>
                                 <button className="deltBtn tableBtn m-1" data-bs-title="Delete Product" data-bs-toggle="tooltip" data-bs-placement="bottom" onClick={() => deleteProduct(product._id)}>
@@ -169,11 +193,10 @@ const AllProducts = () => {
                 aria-label="Default select example"
                 value={selectedCategory}
                 onChange={handleCategoryChange}
+                defaultValue="all"
             >
                 <option value="all">All products</option>
-                <option value="shirt">Shirt</option>
-                <option value="bag">Bag</option>
-                <option value="shoe">Shoe</option>
+                {categories.map((category) => (<option value={category.name}>{category.name.toUpperCase()}</option>))}
             </select>
         </div>
     );
@@ -216,13 +239,6 @@ const AllProducts = () => {
         </nav>
     );
 
-
-
-
-
-
-
-
     return (
         <div className="container dashBoardContainer">
             <h1 className="text-center py-3 roboto sectHead text-capitalize text-dark">all products</h1>
@@ -241,13 +257,20 @@ const AllProducts = () => {
             </div>
             <div className="pannelDashed pannelDashedallPrdct allProductTable bg-light rounded border p-3">
                 <h1 className="fs-3 py-3 roboto sectHead text-capitalize text-dark">
-                    all products <span className="fw-bold">(558)</span>
+                    all products <span className="fw-bold">({count})</span>
                 </h1>
-                <ProductLists />
+                {loading ? (
+                    <Loader itemName={'Loading product'} />
+                ) : products == [] ? (
+                    <p className='text-center pt-3'>No products available.</p>
+                ) : (
+                    <ProductLists />
+                )}
+
             </div>
             <div className="d-flex border rounded align-items-center justify-content-between p-2 px-3 mt-3 bg-light mb-2">
                 <div className="productNumbers text-dark fw-bolder">
-                    <span className="fw-bold">558</span> Products
+                    <span className="fw-bold">{count}</span> Products
                 </div>
                 <FooterPagination />
             </div>

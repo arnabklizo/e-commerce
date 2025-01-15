@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ReactQuill from 'react-quill';
 import { useNavigate } from 'react-router-dom';
+import Loader from '../../../components/loader/loader';
 import Cookies from 'js-cookie';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashCan, faLeftLong } from '@fortawesome/free-solid-svg-icons';
@@ -229,184 +230,190 @@ const NewProduct = () => {
                 <h1 className="text-center roboto sectHead text-capitalize text-dark pt-4 pb-3">
                     Add New Product
                 </h1>
+                {loading ? (
+                    <div className="my-5 py-5">
+                        <Loader itemName={'Uploading product'} />
+                    </div>
+                ) : (
+                    <form className="rounded border newProduct p-3 mb-3" onSubmit={handleSubmit}>
+                        <div className="row">
+                            {/* Left Column */}
+                            <div className="col-12 col-lg-6">
+                                <div className="fw-bolder text-dark fs-5 mb-3">Information</div>
+                                <InputField
+                                    id="nameOfProduct"
+                                    label="Product Name"
+                                    placeholder="Type New Product Name"
+                                    value={formData.productName}
+                                    onChange={handleChange}
+                                    name="productName"
+                                    required
+                                />
+                                <div className="mb-3">
+                                    <label htmlFor="productDescription" className="form-label">Product Description</label>
+                                    <div id="editor-container" className='border rounded bg-white overflow-hidden'>
+                                        <React.StrictMode>
+                                            <ReactQuill
+                                                value={formData.productDescription}
+                                                onChange={handleDescriptionChange}
+                                                modules={{ toolbar: [['bold', 'italic', 'underline']] }}
+                                            />
+                                        </React.StrictMode>
 
-                <form className="rounded border newProduct p-3 mb-3" onSubmit={handleSubmit}>
-                    <div className="row">
-                        {/* Left Column */}
-                        <div className="col-12 col-lg-6">
-                            <div className="fw-bolder text-dark fs-5 mb-3">Information</div>
-                            <InputField
-                                id="nameOfProduct"
-                                label="Product Name"
-                                placeholder="Type New Product Name"
-                                value={formData.productName}
-                                onChange={handleChange}
-                                name="productName"
-                                required
-                            />
-                            <div className="mb-3">
-                                <label htmlFor="productDescription" className="form-label">Product Description</label>
-                                <div id="editor-container" className='border rounded bg-white overflow-hidden'>
-                                    <React.StrictMode>
-                                        <ReactQuill
-                                            value={formData.productDescription}
-                                            onChange={handleDescriptionChange}
-                                            modules={{ toolbar: [['bold', 'italic', 'underline']] }}
+                                    </div>
+                                </div>
+                                <InputField
+                                    id="productNumbs"
+                                    label="Product in Stock"
+                                    type="number"
+                                    placeholder="Enter number of stock"
+                                    value={formData.productStock}
+                                    onChange={handleChange}
+                                    name="productStock"
+                                    required
+                                />
+                                <div className="fw-bolder text-dark fs-5 mb-3">Image</div>
+                                <div className="upload-container">
+                                    <div
+                                        id="drop-area"
+                                        className="drop-area text-center"
+                                        onDragOver={handleDragOver}
+                                        onDrop={handleDrop}
+                                    >
+                                        <label htmlFor="file-input" className="upload-btn btn mb-3 btn-outline-primary">
+                                            Click to Upload
+                                        </label>
+                                        <p>Drag & Drop your picture here or</p>
+                                        <input
+                                            type="file"
+                                            id="file-input"
+                                            className="file-input"
+                                            accept="image/*"
+                                            multiple
+                                            onChange={handleFileSelect}
                                         />
-                                    </React.StrictMode>
-
+                                    </div>
+                                    <div id="image-preview" className="image-preview m-auto">
+                                        {formData.images.map((image, idx) => (
+                                            <div key={idx} className="image-preview-item position-relative">
+                                                <img src={URL.createObjectURL(image)} alt={`Uploaded preview ${idx}`} className="img-thumbnail" />
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-sm btn-danger position-absolute bottom-0 start-50 translate-middle-x"
+                                                    onClick={() => handleImageDelete(idx)}
+                                                >
+                                                    <FontAwesomeIcon icon={faTrashCan} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
-                            <InputField
-                                id="productNumbs"
-                                label="Product in Stock"
-                                type="number"
-                                placeholder="Enter number of stock"
-                                value={formData.productStock}
-                                onChange={handleChange}
-                                name="productStock"
-                                required
-                            />
-                            <div className="fw-bolder text-dark fs-5 mb-3">Image</div>
-                            <div className="upload-container">
-                                <div
-                                    id="drop-area"
-                                    className="drop-area text-center"
-                                    onDragOver={handleDragOver}
-                                    onDrop={handleDrop}
+
+                            {/* Right Column */}
+                            <div className="col-12 col-lg-6">
+                                <div className="fw-bolder text-dark fs-5 mb-3">Price</div>
+                                <InputField
+                                    id="priceOfProduct"
+                                    label="Product Price"
+                                    type="number"
+                                    placeholder="Enter price"
+                                    value={formData.productPrice}
+                                    onChange={handleChange}
+                                    name="productPrice"
+                                    required
+                                />
+                                <InputField
+                                    id="discountPriceOfProduct"
+                                    label="Discount Price"
+                                    type="number"
+                                    placeholder="Enter discounted price"
+                                    value={formData.discountPrice}
+                                    onChange={handleChange}
+                                    name="discountPrice"
+
+                                />
+                                <div className="fw-bolder text-dark fs-5 mb-3">Product For</div>
+                                <InputField
+                                    as="select"
+                                    id="productFor"
+                                    label="Product For"
+                                    value={formData.productFor}
+                                    onChange={handleChange}
+                                    name="productFor"
+                                    required
                                 >
-                                    <label htmlFor="file-input" className="upload-btn btn mb-3 btn-outline-primary">
-                                        Click to Upload
-                                    </label>
-                                    <p>Drag & Drop your picture here or</p>
+                                    <option value="" disabled>Open this select menu</option>
+                                    <option value="men">Men</option>
+                                    <option value="women">Women</option>
+                                    <option value="boy">Boy</option>
+                                    <option value="girl">Girl</option>
+                                    <option value="unisex">Unisex</option>
+                                </InputField>
+
+                                <div className="fw-bolder text-dark fs-5 mb-3">Add Features for this Product</div>
+                                <div className="d-flex align-items-center flex-column-reverse flex-lg-row">
+                                    <button type="button" className="addFeatures btn btn-dark my-2" onClick={handleFeatureAdd}>
+                                        Add Product Features
+                                    </button>
                                     <input
-                                        type="file"
-                                        id="file-input"
-                                        className="file-input"
-                                        accept="image/*"
-                                        multiple
-                                        onChange={handleFileSelect}
+                                        type="text"
+                                        className="form-control featuresInp"
+                                        id="itemInput"
+                                        placeholder="Enter key point here"
+                                        value={newFeature}
+                                        onChange={(e) => setNewFeature(e.target.value)}
                                     />
                                 </div>
-                                <div id="image-preview" className="image-preview m-auto">
-                                    {formData.images.map((image, idx) => (
-                                        <div key={idx} className="image-preview-item position-relative">
-                                            <img src={URL.createObjectURL(image)} alt={`Uploaded preview ${idx}`} className="img-thumbnail" />
+                                <ul id="listBox" className="list-unstyled keyPointList">
+                                    {formData.productFeatures.map((feature, idx) => (
+                                        <li key={idx} className="d-flex justify-content-between align-items-center">
+                                            <span className='text-dark'>{feature}</span>
                                             <button
                                                 type="button"
-                                                className="btn btn-sm btn-danger position-absolute bottom-0 start-50 translate-middle-x"
-                                                onClick={() => handleImageDelete(idx)}
+                                                className="btn btn-sm border border-dark"
+                                                onClick={() => handleFeatureDelete(idx)}
                                             >
                                                 <FontAwesomeIcon icon={faTrashCan} />
                                             </button>
-                                        </div>
+                                        </li>
                                     ))}
-                                </div>
+                                </ul>
+
+                                <div className="fw-bolder text-dark fs-5 mb-3">Categories</div>
+
+
+                                <select
+                                    className='form-select mb-4'
+                                    name="categories"
+                                    value={formData.categories}
+                                    defaultValue=""
+                                    onChange={(e) =>
+                                        setFormData({ ...formData, categories: e.target.value })
+                                    }
+                                    required
+                                >
+                                    <option value="" disabled>Open this select menu</option>
+
+                                    {categories.map((category) => (
+                                        <option key={category._id} value={category._id}>
+                                            {category.name}
+                                        </option>
+                                    ))}
+                                </select>
+
+
                             </div>
                         </div>
 
-                        {/* Right Column */}
-                        <div className="col-12 col-lg-6">
-                            <div className="fw-bolder text-dark fs-5 mb-3">Price</div>
-                            <InputField
-                                id="priceOfProduct"
-                                label="Product Price"
-                                type="number"
-                                placeholder="Enter price"
-                                value={formData.productPrice}
-                                onChange={handleChange}
-                                name="productPrice"
-                                required
-                            />
-                            <InputField
-                                id="discountPriceOfProduct"
-                                label="Discount Price"
-                                type="number"
-                                placeholder="Enter discounted price"
-                                value={formData.discountPrice}
-                                onChange={handleChange}
-                                name="discountPrice"
-
-                            />
-                            <div className="fw-bolder text-dark fs-5 mb-3">Product For</div>
-                            <InputField
-                                as="select"
-                                id="productFor"
-                                label="Product For"
-                                value={formData.productFor}
-                                onChange={handleChange}
-                                name="productFor"
-                                required
-                            >
-                                <option value="" disabled>Open this select menu</option>
-                                <option value="men">Men</option>
-                                <option value="women">Women</option>
-                                <option value="boy">Boy</option>
-                                <option value="girl">Girl</option>
-                                <option value="unisex">Unisex</option>
-                            </InputField>
-
-                            <div className="fw-bolder text-dark fs-5 mb-3">Add Features for this Product</div>
-                            <div className="d-flex align-items-center flex-column-reverse flex-lg-row">
-                                <button type="button" className="addFeatures btn btn-dark my-2" onClick={handleFeatureAdd}>
-                                    Add Product Features
-                                </button>
-                                <input
-                                    type="text"
-                                    className="form-control featuresInp"
-                                    id="itemInput"
-                                    placeholder="Enter key point here"
-                                    value={newFeature}
-                                    onChange={(e) => setNewFeature(e.target.value)}
-                                />
-                            </div>
-                            <ul id="listBox" className="list-unstyled keyPointList">
-                                {formData.productFeatures.map((feature, idx) => (
-                                    <li key={idx} className="d-flex justify-content-between align-items-center">
-                                        <span className='text-dark'>{feature}</span>
-                                        <button
-                                            type="button"
-                                            className="btn btn-sm border border-dark"
-                                            onClick={() => handleFeatureDelete(idx)}
-                                        >
-                                            <FontAwesomeIcon icon={faTrashCan} />
-                                        </button>
-                                    </li>
-                                ))}
-                            </ul>
-
-                            <div className="fw-bolder text-dark fs-5 mb-3">Categories</div>
-
-
-                            <select
-                                className='form-select mb-4'
-                                name="categories"
-                                value={formData.categories}
-                                defaultValue=""
-                                onChange={(e) =>
-                                    setFormData({ ...formData, categories: e.target.value })
-                                }
-                                required
-                            >
-                                <option value="" disabled>Open this select menu</option>
-
-                                {categories.map((category) => (
-                                    <option key={category._id} value={category._id}>
-                                        {category.name}
-                                    </option>
-                                ))}
-                            </select>
-
-
+                        <div className="text-center">
+                            <button className="btn btn-dark my-2" type="submit">
+                                Save Product Details
+                            </button>
                         </div>
-                    </div>
+                    </form>
+                )}
 
-                    <div className="text-center">
-                        <button className="btn btn-dark my-2" type="submit">
-                            Save Product Details
-                        </button>
-                    </div>
-                </form>
 
                 <div className="text-center mb-3">
                     <button

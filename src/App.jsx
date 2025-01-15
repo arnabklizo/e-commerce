@@ -194,7 +194,7 @@ function App() {
             }
           />
           <Route
-            path="/previewProduct"
+            path="/previewProduct/:id"
             element={
               <Layout admin>
                 <PreviewProduct />
