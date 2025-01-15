@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Loader from '../../../components/loader/loader';
 import { Tooltip } from 'bootstrap';
-import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import CategoryAdd from '../../../modals/categoryModal/CategoryAdd';
@@ -36,6 +35,12 @@ const CategoryList = () => {
     const [isVisibleCat, setVisibleCat] = useState(false);
     const [count, setCount] = useState(0);
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [sortField, setSortField] = useState('createdAt');
+    const [sortOrder, setSortOrder] = useState('desc');
+
+
     const navigate = useNavigate();
 
     //update Category
@@ -61,12 +66,14 @@ const CategoryList = () => {
 
 
     //fetch Category
-    const fetchCategories = async () => {
+    const fetchCategories = async (page = 1, limit = 5) => {
         setLoading(true);
         try {
-            const response = await getCategories();
+            const response = await getCategories(page, limit, sortField, sortOrder);
             setCategories(response.data.categories);
-            setCount(response.data.count)
+            setCount(response.data.totalCount);
+            setTotalPages(Math.ceil(response.data.totalCount / limit));
+            setCurrentPage(page);
         } catch (error) {
             console.error('Failed to fetch categories:', error);
         } finally {
@@ -74,8 +81,9 @@ const CategoryList = () => {
         }
     };
 
+
     // Fetch categories from the backend
-    useEffect(() => { fetchCategories(); }, []);
+    useEffect(() => { fetchCategories(currentPage); }, [sortField, sortOrder, currentPage]);
 
     // delete category
     const deleteCategory = async (id) => {
@@ -104,8 +112,21 @@ const CategoryList = () => {
     }, [navigate]);
 
 
+    const handlePageChange = (newPage) => {
+        fetchCategories(newPage); // Fetch categories with the current sort state
+    };
+
+    // short 
+    const handleSort = (field) => {
+        const newSortOrder = sortField === field && sortOrder === 'asc' ? 'desc' : 'asc';
+        setSortField(field);
+        setSortOrder(newSortOrder);
+    };
+
 
     // back end code ends here 
+
+
 
     // Initialize tooltips
     useEffect(() => {
@@ -113,13 +134,15 @@ const CategoryList = () => {
             (tooltipTriggerEl) => new Tooltip(tooltipTriggerEl)
         );
         return () => tooltips.forEach((tooltip) => tooltip.dispose());
-    }, []);
+    }, [categories]);
 
+    // for open edit modal 
     const openEditModal = (category) => {
         setSelectedCategory(category);
         setEditModalVisible(true);
     };
 
+    // close edit modal 
     const closeEditModal = () => {
         setEditModalVisible(false);
         setSelectedCategory(null);
@@ -132,6 +155,7 @@ const CategoryList = () => {
         fetchCategories();
     }
 
+    // search bar 
     const SearchBar = () => (
         <form className="input-group">
             <input type="text" className="form-control" placeholder="Search category" />
@@ -141,24 +165,43 @@ const CategoryList = () => {
         </form>
     );
 
-    const SortButton = ({ ascIcon, descIcon }) => (
-        <button className="sortButton border-0 bg-transparent mx-1">
-            <FontAwesomeIcon icon={ascIcon} className="asc d-none" />
-            <FontAwesomeIcon icon={descIcon} className="desc" />
+    // short button 
+    const SortButton = ({ field, ascIcon, descIcon, shortText }) => (
+        <button
+            className="sortButton border-0 bg-transparent mx-1"
+            onClick={() => handleSort(field)}
+            data-bs-toggle="tooltip"
+            title={`Short ${shortText}`}
+            data-bs-placement="bottom"
+        >
+            <FontAwesomeIcon icon={sortField === field && sortOrder === 'asc' ? ascIcon : descIcon} />
         </button>
     );
 
+
+
+    // table 
     const CategoryTable = () => (
         <table className=" w-100">
             <thead>
                 <tr>
                     <th>
                         Category Name
-                        <SortButton ascIcon={faArrowDownAZ} descIcon={faArrowDownZA} />
+                        <SortButton
+                            field="name"
+                            ascIcon={faArrowDownZA}
+                            descIcon={faArrowDownAZ}
+                            shortText={'alphabetically'}
+                        />
                     </th>
                     <th>
                         Items
-                        <SortButton ascIcon={faArrowDownWideShort} descIcon={faArrowDownShortWide} />
+                        <SortButton
+                            field="itemCount"
+                            ascIcon={faArrowDownWideShort}
+                            descIcon={faArrowDownShortWide}
+                            shortText={'by number'}
+                        />
                     </th>
                     <th className='text-center'>Actions</th>
                 </tr>
@@ -189,6 +232,7 @@ const CategoryList = () => {
                                     className="editRegisteredBtn rounded border text-dark p-2 m-1"
                                     data-bs-toggle="tooltip"
                                     title="Edit this category"
+                                    data-bs-placement="bottom"
                                     onClick={() => openEditModal(category)}
                                 >
                                     <FontAwesomeIcon icon={faPencil} /> Edit
@@ -197,6 +241,7 @@ const CategoryList = () => {
                                     className="editRegister rounded border text-dark p-2 m-1"
                                     data-bs-toggle="tooltip"
                                     title="Delete this category"
+                                    data-bs-placement="bottom"
                                     onClick={() => deleteCategory(category._id)}
                                 >
                                     <FontAwesomeIcon icon={faTrashCan} /> Delete
@@ -209,25 +254,31 @@ const CategoryList = () => {
         </table>
     );
 
+    // pagination 
     const FooterPagination = () => (
         <nav>
             <ul className="pagination mb-0">
-                <li className="page-item">
-                    <Link className="page-link" to="#">
+                <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                    <button className="page-link border border-dark" data-bs-title="Previous Page" data-bs-toggle="tooltip" data-bs-placement="bottom" onClick={() => fetchCategories(currentPage - 1)}>
                         <FontAwesomeIcon icon={faArrowLeft} />
-                    </Link>
+                    </button>
                 </li>
-                {[1, 2, 3, '...', 111].map((page, index) => (
-                    <li key={index} className="page-item">
-                        <Link className={`page-link ${page === 1 ? 'pageSelected' : ''}`} to="#">
-                            {page}
-                        </Link>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <li className="page-item" key={page}>
+                        <button
+                            className={`page-link ${page === currentPage ? 'pageSelected' : ''}`}
+                            onClick={() => handlePageChange(page)}
+                            data-bs-toggle="tooltip"
+                            title={`Go to page ${page}`}
+                            data-bs-placement="bottom"
+                        >{page}</button>
                     </li>
                 ))}
-                <li className="page-item">
-                    <Link className="page-link" to="#">
+
+                <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                    <button className='page-link border border-dark' data-bs-title="Next Page" data-bs-toggle="tooltip" data-bs-placement="bottom" onClick={() => fetchCategories(currentPage + 1)}>
                         <FontAwesomeIcon icon={faArrowRight} />
-                    </Link>
+                    </button>
                 </li>
             </ul>
         </nav>

@@ -13,7 +13,7 @@
 
 .categoryDiv .card .card-img-top {
     object-fit: cover;
-    height: 165px;
+    aspect-ratio: 1/1;
 }
 
 .goBackBtn path {

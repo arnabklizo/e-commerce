@@ -33,6 +33,13 @@ const AllProducts = () => {
     const [categories, setCategories] = useState([]);
     const [count, setCount] = useState(0);
 
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [sortField, setSortField] = useState('createdAt');
+    const [sortOrder, setSortOrder] = useState('desc');
+    const [selectedCategory, setSelectedCategory] = useState('all');
+
     //fetch categories 
     const fetchCategories = async () => {
         setLoading(true);
@@ -47,13 +54,14 @@ const AllProducts = () => {
     };
 
     // fetch products 
-    const fetchProducts = async () => {
+    const fetchProducts = async (page = 1, limit = 5, category = '') => {
         setLoading(true);
         try {
-            const response = await getAllProducts();
+            const response = await getAllProducts(page, limit, sortField, sortOrder, category);
             setProducts(response.data.products);
-            setCount(response.data.count);
-
+            setCount(response.data.totalCount);
+            setTotalPages(Math.ceil(response.data.totalCount / limit));
+            setCurrentPage(page);
         } catch (error) {
             console.error('Failed to fetch products:', error);
             toast.error('Failed to fetch products');
@@ -61,8 +69,12 @@ const AllProducts = () => {
             setLoading(false);
         }
     };
-    // Fetch products from the backend
-    useEffect(() => { fetchProducts(); fetchCategories() }, []);
+
+
+    useEffect(() => {
+        fetchProducts(currentPage, 5, selectedCategory);
+        fetchCategories();
+    }, [sortField, sortOrder, currentPage, selectedCategory]);
 
 
     //delete Product
@@ -84,25 +96,39 @@ const AllProducts = () => {
         }
     };
 
-    // back 
+    // short 
+    const handleSort = (field) => {
+        const newSortOrder = sortField === field && sortOrder === 'asc' ? 'desc' : 'asc';
+        setSortField(field);
+        setSortOrder(newSortOrder);
+    };
+
+    // Handle page changes
+    const handlePageChange = (newPage) => {
+        setCurrentPage(newPage); // Update page, triggers fetch due to useEffect
+    };
+
+    // Handler for category selection change
+    const handleCategoryChange = (event) => {
+        const category = event.target.value;
+        setSelectedCategory(category);
+        setCurrentPage(1); // Reset to the first page on category change
+        fetchProducts(1, 5, category === ' ' ? '' : category); // Pass empty string for "All products"
+    };
+
+
+    // backend end here 
     const navigate = useNavigate();
 
     useEffect(() => {
         const token = Cookies.get('adminToken');
-        // console.log(token)
         if (!token) {
             navigate("/adminLogin");
         }
     }, [navigate]);
 
 
-
-    const [selectedCategory, setSelectedCategory] = useState('all');
-    // Handler for category selection change
-    const handleCategoryChange = (event) => {
-        setSelectedCategory(event.target.value);
-    };
-
+    // tooltip 
     useEffect(() => {
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
         const tooltips = Array.from(tooltipTriggerList).map(
@@ -114,16 +140,25 @@ const AllProducts = () => {
         };
     }, [products]);
 
-    const SortButton = ({ ascIcon, descIcon }) => (
-        <button className="sortButton border-0 bg-transparent mx-1">
-            <span className="asc d-none">
-                <FontAwesomeIcon icon={ascIcon} />
-            </span>
-            <span className="desc">
-                <FontAwesomeIcon icon={descIcon} />
-            </span>
+
+
+
+
+
+    // short button 
+    const SortButton = ({ field, ascIcon, descIcon, shortText }) => (
+        <button
+            className="sortButton border-0 bg-transparent mx-1"
+            onClick={() => handleSort(field)}
+            data-bs-toggle="tooltip"
+            title={`Short ${shortText}`}
+            data-bs-placement="bottom"
+        >
+            <FontAwesomeIcon icon={sortField === field && sortOrder === 'asc' ? ascIcon : descIcon} />
         </button>
     );
+
+
 
     const ProductInfo = ({ imageSrc, name, useFor }) => (
         <div className="d-flex align-items-center productInfo">
@@ -141,9 +176,30 @@ const AllProducts = () => {
         <table className="w-100">
             <thead>
                 <tr>
-                    <th>Product <SortButton ascIcon={faArrowDownAZ} descIcon={faArrowDownZA} /></th>
-                    <th>Inventory <SortButton ascIcon={faArrowDownWideShort} descIcon={faArrowDownShortWide} /></th>
-                    <th>Price <SortButton ascIcon={faArrowDownWideShort} descIcon={faArrowDownShortWide} /></th>
+                    <th>Product
+                        <SortButton
+                            field="name"
+                            ascIcon={faArrowDownAZ}
+                            descIcon={faArrowDownZA}
+                            shortText={'alphabetically'}
+                        />
+                    </th>
+                    <th>Inventory
+                        <SortButton
+                            field="inStock"
+                            ascIcon={faArrowDownShortWide}
+                            descIcon={faArrowDownWideShort}
+                            shortText={'by number'}
+                        />
+                    </th>
+                    <th>Price
+                        <SortButton
+                            field="price"
+                            ascIcon={faArrowDownShortWide}
+                            descIcon={faArrowDownWideShort}
+                            shortText={'by number'}
+                        />
+                    </th>
                     <th>Rating</th>
                     <th></th>
                 </tr>
@@ -181,6 +237,7 @@ const AllProducts = () => {
         </table>
     );
 
+    // filter by category 
     const FilterCategory = () => (
         <div className="filterBox d-flex align-items-center w-25">
             <label htmlFor="filterCategory" className="me-2 fw-bold">
@@ -193,10 +250,13 @@ const AllProducts = () => {
                 aria-label="Default select example"
                 value={selectedCategory}
                 onChange={handleCategoryChange}
-                defaultValue="all"
             >
-                <option value="all">All products</option>
-                {categories.map((category) => (<option value={category.name}>{category.name.toUpperCase()}</option>))}
+                <option value=" ">All products</option>
+                {categories.map((category) => (
+                    <option value={category.name} key={category.name}>
+                        {category.name.toUpperCase()}
+                    </option>
+                ))}
             </select>
         </div>
     );
@@ -217,23 +277,31 @@ const AllProducts = () => {
         </div>
     );
 
+    // pagination 
     const FooterPagination = () => (
-        <nav aria-label="Page navigation example">
+        <nav>
             <ul className="pagination mb-0">
-                <li className="page-item">
-                    <Link className="page-link" to="#" data-bs-title="Previous Page" data-bs-toggle="tooltip" data-bs-placement="bottom">
+                <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                    <button className="page-link border border-dark" data-bs-title="Previous Page" data-bs-toggle="tooltip" data-bs-placement="bottom" onClick={() => fetchProducts(currentPage - 1)}>
                         <FontAwesomeIcon icon={faArrowLeft} />
-                    </Link>
+                    </button>
                 </li>
-                <li className="page-item"><Link className="page-link pageSelected" to="#">1</Link></li>
-                <li className="page-item"><Link className="page-link" to="#">2</Link></li>
-                <li className="page-item"><Link className="page-link" to="#">3</Link></li>
-                <li className="page-item"><Link className="page-link" disabled>...</Link></li>
-                <li className="page-item"><Link className="page-link" to="#">111</Link></li>
-                <li className="page-item">
-                    <Link className="page-link" to="#" data-bs-title="Next Page" data-bs-toggle="tooltip" data-bs-placement="bottom">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <li className="page-item" key={page}>
+                        <button
+                            className={`page-link ${page === currentPage ? 'pageSelected' : ''}`}
+                            onClick={() => handlePageChange(page)}
+                            data-bs-toggle="tooltip"
+                            title={`Go to page ${page}`}
+                            data-bs-placement="bottom"
+                        >{page}</button>
+                    </li>
+                ))}
+
+                <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                    <button className='page-link border border-dark' data-bs-title="Next Page" data-bs-toggle="tooltip" data-bs-placement="bottom" onClick={() => fetchProducts(currentPage + 1)}>
                         <FontAwesomeIcon icon={faArrowRight} />
-                    </Link>
+                    </button>
                 </li>
             </ul>
         </nav>
@@ -261,7 +329,7 @@ const AllProducts = () => {
                 </h1>
                 {loading ? (
                     <Loader itemName={'Loading product'} />
-                ) : products == [] ? (
+                ) : products.length === 0 ? (
                     <p className='text-center pt-3'>No products available.</p>
                 ) : (
                     <ProductLists />

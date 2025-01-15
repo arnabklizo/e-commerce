@@ -520,13 +520,13 @@ svg path {
 
 
 /* pagination */
-.pagination a {
+.pagination button {
     color: var(--bsDark);
     border: 1px solid var(--bsDark);
 }
 
-.pagination a:active,
-.pagination a:hover {
+.pagination button:active,
+.pagination button:hover {
     background-color: #a8dadc;
     border: 1px solid var(--bsDark);
     color: var(--bsBlack);
