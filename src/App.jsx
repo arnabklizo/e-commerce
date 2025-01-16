@@ -194,6 +194,14 @@ function App() {
             }
           />
           <Route
+            path="/addProduct/:id"
+            element={
+              <Layout admin>
+                <NewProduct />
+              </Layout>
+            }
+          />
+          <Route
             path="/previewProduct/:id"
             element={
               <Layout admin>

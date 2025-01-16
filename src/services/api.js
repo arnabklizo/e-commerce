@@ -37,12 +37,13 @@ export const logoutAdmin = () => API.post("/admin/logout"); // Logout admin
 
 // for category
 export const addCategory = (data) => API.post("/admin/categories", data, { headers: { "Content-Type": "multipart/form-data" } });
-export const getCategories = (page, limit, sortField, sortOrder) => API.get(`/admin/categories/`, {
+export const getCategories = (page, limit, sortField, sortOrder, searchQuery) => API.get(`/admin/categories/`, {
     params: {
         page,
         limit,
         sortField,
         sortOrder,
+        searchQuery,
     },
 });
 export const delCategory = (id) => API.delete(`/admin/categories/${id}`);
@@ -50,18 +51,19 @@ export const updateCategory = (data) => API.put(`/admin/categories/${data._id}`,
 
 //for product
 export const addProduct = (data) => API.post("/products/addProduct", data, { headers: { "Content-Type": "multipart/form-data" } });
-export const getAllProducts = (page, limit, sortField, sortOrder, category) => API.get(`/products`, {
+export const getAllProducts = (page, limit, sortField, sortOrder, category, searchQuery) => API.get(`/products`, {
     params: {
         page,
         limit,
         sortField,
         sortOrder,
-        category: category || '',
+        category,
+        searchQuery,
     },
 });
 export const delProduct = (id) => API.delete(`/products/${id}`);
 export const getProduct = (id) => API.get(`/products/${id}`);
-
+export const updateProduct = (id, form) => API.put(`/products/${id}`, form);
 
 
 
