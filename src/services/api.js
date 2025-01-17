@@ -63,7 +63,7 @@ export const getAllProducts = (page, limit, sortField, sortOrder, category, sear
 });
 export const delProduct = (id) => API.delete(`/products/${id}`);
 export const getProduct = (id) => API.get(`/products/${id}`);
-export const updateProduct = (id, form) => API.put(`/products/${id}`, form);
+export const updateProduct = (id, formData) => API.put(`/products/${id}`, formData, { headers: { 'Content-Type': 'multipart/form-data' }, });
 
 
 

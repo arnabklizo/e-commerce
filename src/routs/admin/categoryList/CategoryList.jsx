@@ -6,9 +6,9 @@ import Loader from '../../../components/loader/loader';
 import TimeNow from '../../../components/timer/TimeNow';
 import CategoryAdd from '../../../modals/categoryModal/CategoryAdd';
 import UpdateCategory from '../../../modals/updateCategory/UpdateCategory';
+import ConfirmationModal from '../../../modals/confirmationMOdal/ConfirmationModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-    faMagnifyingGlass,
     faCirclePlus,
     faPencil,
     faTrashCan,
@@ -25,7 +25,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import '../categoryList/category.css';
 
 const CategoryList = () => {
+    const [categoryId, setCategoryId] = useState('')
     const [searchQuery, setSearchQuery] = useState('');
+    const [isConfirmModalVisible, setConfirmModalVisible] = useState(false)
     const [isEditModalVisible, setEditModalVisible] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [categories, setCategories] = useState([]);
@@ -87,19 +89,24 @@ const CategoryList = () => {
         }
     };
 
-    const deleteCategory = async (id) => {
-        if (window.confirm('Are you sure you want to delete this category?')) {
-            setLoading(true);
-            try {
-                await delCategory(id);
-                setCategories(categories.filter((category) => category._id !== id));
-                toast.success('Category deleted successfully!');
-            } catch (error) {
-                console.error('Failed to delete category:', error);
-                toast.error('Error deleting category. Please try again.');
-            } finally {
-                setLoading(false);
-            }
+    const deleteCategory = (id) => {
+        setConfirmModalVisible(true);
+        setCategoryId(id); // Store the category ID to delete
+    };
+
+    const handleConfirmDelete = async (categoryId) => {
+        setConfirmModalVisible(false);
+        setLoading(true);
+        try {
+            await delCategory(categoryId);
+            setCategories(categories.filter((category) => category._id !== categoryId));
+            toast.success('Category deleted successfully!');
+            fetchCategories(1);
+        } catch (error) {
+            console.error('Failed to delete category:', error);
+            toast.error('Error deleting category. Please try again.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -122,6 +129,7 @@ const CategoryList = () => {
         setSelectedCategory(null);
     };
 
+    const closeConfirmModal = () => { setConfirmModalVisible(false) }
     const openEditModal = (category) => {
         setSelectedCategory(category);
         setEditModalVisible(true);
@@ -296,6 +304,13 @@ const CategoryList = () => {
                 category={selectedCategory}
                 onClose={closeEditModal}
                 onSave={handleSaveCategory}
+            />
+            <ConfirmationModal
+                isVisible={isConfirmModalVisible}
+                onClose={closeConfirmModal}
+                message={'category'}
+                onConfirm={handleConfirmDelete}
+                categoryId={categoryId}
             />
         </div>
     );

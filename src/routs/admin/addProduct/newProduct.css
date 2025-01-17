@@ -1,0 +1,163 @@
+.addednewProduct {
+    min-height: calc(100vh - 126px);
+}
+
+.addednewProduct:before {
+    content: "";
+    position: fixed;
+    z-index: -1;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    background-image: url(../../../assets/background/shop.png);
+    background-position: right;
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 0.4;
+}
+
+.newProduct {
+    background-color: var(--baseClr);
+}
+
+.newProduct textarea {
+    resize: none;
+}
+
+.dropping-area,
+.drop-area {
+    border: 2px dashed var(--bsDark);
+    padding: 20px;
+    cursor: pointer;
+    position: relative;
+}
+
+.cat-input,
+.file-input {
+    display: none;
+}
+
+.image-preview img {
+    max-width: 200px;
+    margin-top: 20px;
+    box-shadow: 0px 0px 5px var(--bsBlack);
+    display: block;
+    object-fit: cover;
+    aspect-ratio: 1 / 1;
+}
+
+.image-preview {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+
+.goBackBtn svg path,
+.categoryAddBtn svg path {
+    color: var(--bsWhite);
+}
+
+.addFeatures {
+    cursor: pointer;
+    width: 300px;
+    margin-right: 10px;
+}
+
+.keyPointList li {
+    padding: 5px 10px;
+    background-color: #ddd;
+    border: 0;
+    border-radius: 5px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.keyPointList li:nth-child(2n) {
+    background-color: #bbb;
+}
+
+.keyPointList button {
+    padding: 3px 10px;
+    margin-left: 20px;
+    border: 1px solid var(--bsDark);
+    border-radius: 3px;
+    background-color: var(--bsWhite);
+}
+
+.keyPointList button:hover svg path {
+    color: #9d0208;
+}
+
+.ck-toolbar,
+.ck-editor__top {
+    border-top-left-radius: 0.375rem !important;
+    border-top-right-radius: 0.375rem !important;
+    border-color: var(--baseClr);
+}
+
+.ck-editor__main,
+.ck-content {
+    border-bottom-left-radius: 0.375rem !important;
+    border-bottom-right-radius: 0.375rem !important;
+    border-color: var(--baseClr);
+    color: var(--bsBlack);
+}
+
+.ck-content p,
+.ck-content strong {
+    color: var(--bsBlack);
+}
+
+/* for editor  */
+.ql-toolbar.ql-snow {
+    border: none;
+    border-bottom: 2px solid var(--baseClr);
+}
+
+.ql-container.ql-snow {
+    border: none;
+    height: 100px;
+}
+
+.ql-container.ql-snow p,
+.ql-container.ql-snow strong,
+.ql-container.ql-snow em,
+.ql-container.ql-snow u {
+    color: var(--bsBlack);
+}
+
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: none;
+}
+
+/* responsive  */
+@media(max-width:1399px) {}
+
+@media(max-width:1199px) {}
+
+@media(max-width:991px) {
+    .categoryAddBtn {
+        margin: auto;
+    }
+}
+
+@media(max-width:767px) {}
+
+@media(max-width:575px) {
+    .addFeatures {
+        width: auto;
+    }
+}

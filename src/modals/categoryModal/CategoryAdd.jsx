@@ -45,13 +45,13 @@ const CategoryAdd = ({ isVisible, onClose }) => {
         e.preventDefault();
 
         if (!categoryName) {
-            toast.error("Please provide category name!");
+            toast.error("Please provide category name !");
             return;
         }
 
 
         if (!categoryImage) {
-            toast.error("Please provide category image!");
+            toast.error("Please provide category image !");
             return;
         }
 
@@ -146,7 +146,6 @@ const CategoryAdd = ({ isVisible, onClose }) => {
                                         type="file"
                                         accept="image/*"
                                         onChange={handleImageChange}
-                                        required
                                         className='d-none'
                                     />
                                 </div>

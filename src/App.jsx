@@ -30,7 +30,7 @@ import AdminProfile from './routs/admin/profile/AdminProfile.jsx';
 import NewProduct from './routs/admin/newProduct/NewProduct.jsx';
 import PreviewProduct from './routs/admin/previewProduct/PreviewProduct.jsx';
 import AdminLogin from './routs/admin/login/AdminLogin.jsx';
-
+import UpdateProduct from './routs/admin/addProduct/UpdateProduct.jsx';
 // import Alert from './components/Alert';
 // import TextForms from './components/TextForms';
 // import Foot from './components/Foot';
@@ -194,10 +194,10 @@ function App() {
             }
           />
           <Route
-            path="/addProduct/:id"
+            path="/updateProduct/:id"
             element={
               <Layout admin>
-                <NewProduct />
+                <UpdateProduct />
               </Layout>
             }
           />

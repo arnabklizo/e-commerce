@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import ConfirmationModal from '../../../modals/confirmationMOdal/ConfirmationModal';
 import {
     faCirclePlus,
     faFilter,
@@ -25,6 +26,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import '../allProducts/AllProducts.css';
 
 const AllProducts = () => {
+    const [productId, setProductId] = useState('')
+    const [isConfirmModalVisible, setConfirmModalVisible] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
     const [loading, setLoading] = useState(true);
     const [products, setProducts] = useState([]);
@@ -80,14 +83,19 @@ const AllProducts = () => {
         fetchCategories();
     }, [sortField, sortOrder, currentPage, selectedCategory, searchQuery]);
 
-    const deleteProduct = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this category?')) return;
+    const deleteCategory = (id) => {
+        setConfirmModalVisible(true);
+        setProductId(id); // Store the category ID to delete
+    };
 
+    const handleConfirmDelete = async (productId) => {
+        setConfirmModalVisible(false);
         setLoading(true);
         try {
-            await delProduct(id);
-            setProducts(prev => prev.filter(product => product._id !== id));
+            await delProduct(productId);
+            setProducts(prev => prev.filter(product => product._id !== productId));
             toast.success('Product deleted successfully !!');
+            fetchProducts(1, 5, selectedCategory);
         } catch (error) {
             toast.error('Error deleting category. Please try again.');
         } finally {
@@ -112,6 +120,8 @@ const AllProducts = () => {
         setSelectedCategory(category);
         setCurrentPage(1); // Reset to the first page
     };
+
+    const closeConfirmModal = () => { setConfirmModalVisible(false) }
 
     const SortButton = ({ field, ascIcon, descIcon, shortText }) => (
         <button
@@ -155,7 +165,7 @@ const AllProducts = () => {
                 </tr>
             </thead>
             <tbody>
-                {products.map(product => (
+                {products.map((product) => (
                     <tr key={product._id}>
                         <td><ProductInfo imageSrc={product.imageUrl[0]} name={product.name} useFor={product.category.name} /></td>
                         <td>{product.inStock} in stock</td>
@@ -163,13 +173,13 @@ const AllProducts = () => {
                         <td>5.0 (4.8 Votes)</td>
                         <td>
                             <div className="d-flex">
-                                <Link to={`/addProduct/${product._id}`} className="editBtn tableBtn m-1" data-bs-title="Edit Product" data-bs-toggle="tooltip">
+                                <Link to={`/updateProduct/${product._id}`} className="editBtn tableBtn m-1" data-bs-title="Edit Product" data-bs-toggle="tooltip">
                                     <FontAwesomeIcon icon={faPencil} />
                                 </Link>
                                 <Link to={`/previewProduct/${product._id}`} className="prevwBtn tableBtn m-1" data-bs-title="Preview Product" data-bs-toggle="tooltip">
                                     <FontAwesomeIcon icon={faEye} />
                                 </Link>
-                                <button className="deltBtn tableBtn m-1" data-bs-title="Delete Product" data-bs-toggle="tooltip" onClick={() => deleteProduct(product._id)}>
+                                <button className="deltBtn tableBtn m-1" data-bs-title="Delete Product" data-bs-toggle="tooltip" onClick={() => deleteCategory(product._id)}>
                                     <FontAwesomeIcon icon={faTrashCan} />
                                 </button>
                             </div>
@@ -241,6 +251,8 @@ const AllProducts = () => {
 
     return (
         <div className="container dashBoardContainer">
+            {console.log('products:', products)}
+
             <h1 className="text-center py-3 roboto sectHead text-capitalize text-dark">All Products</h1>
             <div className="d-flex justify-content-between align-items-center py-3">
                 <TimeNow />
@@ -259,12 +271,7 @@ const AllProducts = () => {
                             value={searchQuery}
                             onChange={handleSearchChange}
                         />
-                        {/* <button
-                            className="input-group-text"
-                            onClick={() => fetchProducts(1)} // Fetch with search query
-                        >
-                            <FontAwesomeIcon icon={faMagnifyingGlass} />
-                        </button> */}
+
                     </form>
                 </div>
             </div>
@@ -277,7 +284,9 @@ const AllProducts = () => {
                 ) : products.length === 0 ? (
                     <p className="text-center pt-3">No products available.</p>
                 ) : (
-                    <ProductLists />
+                    <>
+                        <ProductLists />
+                    </>
                 )}
             </div>
             <div className="d-flex border rounded align-items-center justify-content-between p-2 px-3 mt-3 bg-light mb-2">
@@ -286,6 +295,13 @@ const AllProducts = () => {
                 </div>
                 <FooterPagination />
             </div>
+            <ConfirmationModal
+                isVisible={isConfirmModalVisible}
+                onClose={closeConfirmModal}
+                message={'Product'}
+                onConfirm={handleConfirmDelete}
+                categoryId={productId}
+            />
         </div>
     );
 };
