@@ -13,12 +13,19 @@
 }
 
 
+
 .showAllProducts {
     min-height: calc(100vh - 122px);
 }
 
 .products {
     gap: 20px;
+}
+
+.products .card-title {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .products img {
@@ -44,7 +51,7 @@
     align-items: center;
     width: 100%;
     padding: 3px 10px;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(30px);
     background-color: #dfe0dc80;
 }
 

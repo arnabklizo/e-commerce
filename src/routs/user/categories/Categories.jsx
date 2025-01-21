@@ -6,23 +6,22 @@ import { faLeftLong } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import { getCategories } from '../../../services/api';
 import { toast } from "react-toastify";
-
+import Loader from '../../../components/loader/Loader';
 
 const Categories = () => {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [count, setCount] = useState(0); // Add a state for category count
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchCategories = async () => {
-            setLoading(true);
             try {
+                setLoading(true);
                 const response = await getCategories();
                 setCategories(response.data.categories);
-                // console.log(response.data.categories)
-                setCount(response.data.count)
             } catch (error) {
                 console.error('Failed to fetch categories:', error);
+                toast.error("Failed to load categories. Please try again later.");
             } finally {
                 setLoading(false);
             }
@@ -31,57 +30,54 @@ const Categories = () => {
         fetchCategories();
     }, []);
 
-
-
-
-
-    // front 
-    const navigate = useNavigate();
-
-    const goBack = () => {
-        navigate(-1);
-    };
-
-
-
     return (
-        <>
-            {/* <!-- main  --> */}
-            <section className="categoriesSection">
-                <div className="container">
-                    <h1 className="text-center roboto sectHead text-capitalize text-dark my-2">
-                        All Categories
-                    </h1>
-
-
-
+        <section className="categoriesSection">
+            <div className="container">
+                <h1 className="text-center roboto sectHead text-capitalize text-dark my-2">
+                    All Categories
+                </h1>
+                {loading ? (
+                    <Loader itemName="Loading categories" admin={false} />
+                ) : (
                     <div className="categoriesBox my-3 p-2">
                         <div className="categoryDiv d-flex flex-wrap justify-content-center">
-                            {categories.map(((category) => (
-                                <Link to="/showroducts" className="categories text-decoration-none m-2" key={category._id}>
-                                    <div className="card" >
-                                        <img src={category.imageUrl} className="card-img-top" alt="..." />
+                            {categories.map((category) => (
+                                <Link
+                                    to={`/showroducts/${category._id}`}
+                                    className="categories text-decoration-none m-2"
+                                    key={category._id}
+                                >
+                                    <div className="card">
+                                        <img
+                                            src={category.imageUrl || '/default-image.png'}
+                                            className="card-img-top"
+                                            alt={category.name || 'Category'}
+                                        />
                                         <div className="card-body">
-                                            <h5 className="card-title">{category.name}</h5>
-                                            <p className="card-text">{category.itemCount} Items</p>
+                                            <h5 className="card-title">{category.name || 'Unnamed Category'}</h5>
+                                            <p className="card-text">
+                                                {category.itemCount || 0} Items
+                                            </p>
                                         </div>
                                     </div>
                                 </Link>
-                            )))}
+                            ))}
                         </div>
                     </div>
+                )}
 
-                    <div className="text-center my-3">
-                        <button className="btn whiteIcon btn-dark d-flex align-items-center justify-content-center m-auto"
-                            onClick={goBack}>
-                            <FontAwesomeIcon icon={faLeftLong} className='me-2' />
-                            <span className="text-light roboto">Go back</span>
-                        </button>
-                    </div>
+                <div className="text-center my-3">
+                    <button
+                        className="btn whiteIcon btn-dark d-flex align-items-center justify-content-center m-auto"
+                        onClick={() => navigate(-1)}
+                    >
+                        <FontAwesomeIcon icon={faLeftLong} className="me-2" />
+                        <span className="text-light roboto">Go back</span>
+                    </button>
                 </div>
-            </section>
-        </>
-    )
-}
+            </div>
+        </section>
+    );
+};
 
-export default Categories
+export default Categories;

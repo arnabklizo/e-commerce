@@ -1,25 +1,20 @@
 import axios from "axios";
 
-// Create an axios instance with a base URL and credentials setting
+
 const API = axios.create({
-    baseURL: "http://localhost:5000/api", // Use an environment variable for the base URL
-    // baseURL: process.env.REACT_APP_API_URL || "http://localhost:5000/api", // Use an environment variable for the base URL
-    withCredentials: true, // Makes cookies accessible
+    baseURL: "http://localhost:5000/api",
+    withCredentials: true,
 });
 
 // Interceptor for handling API responses or errors globally
 API.interceptors.response.use(
-    (response) => response, // If the response is successful, return it
+    (response) => response,
     (error) => {
-        // Handle error responses
         if (error.response) {
-            // The request was made and the server responded with an error
             console.error("API error:", error.response.data);
         } else if (error.request) {
-            // The request was made but no response was received
             console.error("No response from server:", error.request);
         } else {
-            // Something else happened
             console.error("Error occurred:", error.message);
         }
         return Promise.reject(error);
@@ -58,12 +53,20 @@ export const getAllProducts = (page, limit, sortField, sortOrder, category, sear
         sortField,
         sortOrder,
         category,
-        searchQuery,
+        searchQuery
     },
 });
 export const delProduct = (id) => API.delete(`/products/${id}`);
 export const getProduct = (id) => API.get(`/products/${id}`);
 export const updateProduct = (id, formData) => API.put(`/products/${id}`, formData, { headers: { 'Content-Type': 'multipart/form-data' }, });
+
+
+//get productsByCategory
+export const getProductsByCategory = (id, filterSearch) => API.get(`/products/category/${id}`, {
+    params: {
+        filterSearch,
+    },
+});
 
 
 

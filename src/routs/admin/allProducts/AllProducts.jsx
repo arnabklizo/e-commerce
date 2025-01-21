@@ -19,7 +19,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { Tooltip } from "bootstrap";
 import { toast } from 'react-toastify';
-import Loader from '../../../components/loader/loader';
+import Loader from '../../../components/loader/Loader';
 import TimeNow from '../../../components/timer/TimeNow';
 import { getAllProducts, delProduct, getCategories } from '../../../services/api';
 import 'react-toastify/dist/ReactToastify.css';

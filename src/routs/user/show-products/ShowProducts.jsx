@@ -1,669 +1,174 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLeftLong, faFilter, faHeart, faHandPointRight } from '@fortawesome/free-solid-svg-icons';
-import { product } from '../../../constans/product';
 import './ShowProducts.css';
+import { getProductsByCategory } from '../../../services/api';
+import Loader from '../../../components/loader/Loader';
+import { Link } from 'react-router-dom';
+
 
 const ShowProducts = () => {
+    const [filterSearch, setFilterSearch] = useState('all')
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+    const { id } = useParams();
 
-    const goBack = () => {
-        navigate(-1);
+    // Redirect if ID is missing
+    useEffect(() => {
+        if (!id) navigate(-1);
+    }, [id, navigate]);
+
+    // Fetch products by category
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                setLoading(true);
+                const response = await getProductsByCategory(id, filterSearch);
+                setProducts(response.data.products);
+            } catch (error) {
+                console.error('Failed to fetch categories:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProducts();
+    }, [id, filterSearch]);
+
+    const handleFilterChange = (e) => {
+        setFilterSearch(e.target.value);
+    }
+
+    const renderPrice = (product) => {
+        return product.discountPrice > 0 ? (
+            <>
+                <span className="text-decoration-line-through discountClr hotcolor pe-3">
+                    &#8377;<span className="price fw-bold hotcolor">{product.price}</span>/
+                </span>
+                &#8377;<span className="price fw-bold text-dark">
+                    {product.price - product.discountPrice}
+                </span>/-
+            </>
+        ) : (
+            <>&#8377;<span className="price fw-bold text-dark">{product.price}</span>/</>
+        );
     };
+
     return (
-        <>
-            <section className="showAllProducts">
-                <div className="container">
+        <section className="showAllProducts">
+            <div className="container">
+                <div className="allProdctFiltSect d-flex py-2 justify-content-between align-items-center mb-5 border-bottom">
+                    <button
+                        className="btn goBackBtn whiteIcon roboto btn-dark d-flex align-items-center justify-content-center"
+                        onClick={() => navigate(-1)}
+                    >
+                        <FontAwesomeIcon icon={faLeftLong} className="me-2" />
+                        <span className="text-light roboto">Go back</span>
+                    </button>
 
-                    <div className=" allProdctFiltSect d-flex py-2 justify-content-between align-items-center mb-5 border-bottom">
-                        <div className="text-sm-left text-center my-2 w-300">
-                            <button
-                                className="btn goBackBtn whiteIcon roboto btn-dark d-flex align-items-center justify-content-center m-auto m-sm-0"
-                                onclick="history.back()">
-                                <FontAwesomeIcon icon={faLeftLong} className='me-2' />
-                                <span className="text-light roboto" onClick={goBack}>Go back</span>
-                            </button>
-                        </div>
+                    <h1 className="text-center roboto fs-4">All Products</h1>
 
-                        <h1 className="text-center roboto fs-4 w-300">All Products</h1>
-
-                        <div className="filterBox d-flex align-items-center justify-content-center justify-content-sm-end w-300">
-                            <label for="filterCategory" className="me-2 fw-bold">
-                                <FontAwesomeIcon icon={faFilter} className='me-1' />
-                                Catagory :
-                            </label>
-                            <select id="filterCategory" className="form-select w-50" aria-label="Default select example">
-                                <option value="all" selected>All products</option>
-                                <option value="shirt">Shirt</option>
-                                <option value="bag">Bag</option>
-                                <option value="shoe">Shoe</option>
-                            </select>
-                        </div>
-
+                    <div className="filterBox d-flex align-items-center">
+                        <label htmlFor="filterCategory" className="me-2 fw-bold">
+                            <FontAwesomeIcon icon={faFilter} className="me-1" />
+                            Short by:
+                        </label>
+                        <select
+                            id="filterCategory"
+                            className="form-select w-50"
+                            aria-label="Default select example"
+                            onClick={handleFilterChange}
+                        >
+                            <option value="" defaultValue>
+                                All products
+                            </option>
+                            <option value="men">Men</option>
+                            <option value="women">Women</option>
+                            <option value="unisex">Unisex</option>
+                        </select>
                     </div>
+                </div>
 
-
-                    {/* <!-- all products will appear here  --> */}
-                    <div className="products d-flex flex-wrap justify-content-center">
-
-                        <div className="card onSale">
-                            {/* <!-- product image   --> */}
-
-                            <img src={product.hoodie} className="card-img-top" alt="" />
-
-                            <div className="cardPrice">
-                                <span className="priceBox fw-bold text-dark">
-                                    <span className="text-decoration-line-through hotcolor pe-3">
-                                        &#8377;<span className="price fw-bold hotcolor">2599</span>/
+                {/* Product Cards */}
+                <div className="products d-flex flex-wrap justify-content-center">
+                    {loading ? (
+                        <Loader itemName="Loading product" admin={false} />
+                    ) : products.length == 0 ? (
+                        <div className="py-5 text-center my-5">
+                            No products available.
+                        </div>
+                    ) : (products.map((product) => (
+                        <>
+                            <div
+                                key={product._id}
+                                className={`card ${product.productFor === 'women'
+                                    ? 'onHot'
+                                    : product.discountPrice > 0
+                                        ? 'onSale'
+                                        : ''
+                                    }`}
+                            >
+                                <img
+                                    src={product.imageUrl[0]}
+                                    className="card-img-top"
+                                    alt={product.name}
+                                />
+                                <div className="cardPrice">
+                                    <span className="priceBox fw-bold text-dark">
+                                        {renderPrice(product)}
                                     </span>
-                                    &#8377;<span className="price fw-bold text-dark">1599</span>/-
-                                </span>
-                            </div>
-                            <button className="btn btn-wishlist" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                data-bs-title="Add to wishlist">
-                                <FontAwesomeIcon icon={faHeart} />
-                            </button>
-                            <div className="card-header">
-                                {/* <!-- product name  --> */}
-                                <h5 className="card-title">Yellow Reserved Hoodie</h5>
-                            </div>
-                            <div className="card-body">
-                                {/* <!-- key points  --> */}
-                                <div className="card-text">
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">100% Cotton</span>
-                                    </div>
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">Breathable Fabric</span>
-                                    </div>
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">260gsm</span>
+                                </div>
+                                <button
+                                    className="btn btn-wishlist"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="bottom"
+                                    data-bs-title="Add to wishlist"
+                                >
+                                    <FontAwesomeIcon icon={faHeart} />
+                                </button>
+                                <div className="card-header">
+                                    <h5 className="card-title">{product.name}</h5>
+                                </div>
+                                <div className="card-body">
+                                    <div className="card-text">
+                                        {product.productFeatures.slice(0, 3).map((feature, index) => (
+                                            <div className="pointKeysCard" key={feature}>
+                                                <FontAwesomeIcon icon={faHandPointRight} className="me-1" />
+                                                <span className="keys">
+                                                    {index === 2 && product.productFeatures.length > 3 ? '...' : feature}
+                                                </span>
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
-
-                            </div>
-                            <div className="card-footer">
-                                <div className="text-center">
-                                    <a href="/product" className="btn btn-dark roboto m-auto">View Details</a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="card">
-                            {/* <!-- product image   --> */}
-                            <img src={product.jogger} className="card-img-top" alt="" />
-
-                            <div className="cardPrice">
-                                <span className="priceBox fw-bold text-dark">
-                                    &#8377;<span className="price fw-bold text-dark">549</span>/-
-                                </span>
-                            </div>
-                            <button className="btn btn-wishlist" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                data-bs-title="Add to wishlist">
-                                <FontAwesomeIcon icon={faHeart} />
-                            </button>
-                            <div className="card-header">
-                                {/* <!-- product name  --> */}
-                                <h5 className="card-title">Adicolor Classics Joggers</h5>
-                            </div>
-                            <div className="card-body">
-                                {/* <!-- key points  --> */}
-                                <div className="card-text">
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">100% Cotton</span>
-                                    </div>
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">Breathable Fabric</span>
-                                    </div>
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">260gsm</span>
+                                <div className="card-footer">
+                                    <div className="text-center">
+                                        <Link to={`/product/${product._id}`} className="btn btn-dark roboto">
+                                            View Details
+                                        </Link>
                                     </div>
                                 </div>
                             </div>
-                            <div className="card-footer">
-                                <div className="text-center">
-                                    <a href="/product" className="btn btn-dark roboto m-auto">View Details</a>
-                                </div>
-                            </div>
-                        </div>
+                        </>
+                    )))}
 
-                        <div className="card">
-                            {/* <!-- product image   --> */}
-                            <img src={product.futuraLuxe} className="card-img-top" alt="" />
-
-                            <div className="cardPrice">
-                                <span className="priceBox fw-bold text-dark">
-                                    &#8377;<span className="price fw-bold text-dark">2199</span>/-
-                                </span>
-                            </div>
-                            <button className="btn btn-wishlist" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                data-bs-title="Add to wishlist">
-                                <FontAwesomeIcon icon={faHeart} />
-                            </button>
-                            <div className="card-header">
-                                {/* <!-- product name  --> */}
-                                <h5 className="card-title">Nike Sportswear Futura Luxe</h5>
-
-                            </div>
-
-                            <div className="card-body">
-                                {/* <!-- key points  --> */}
-                                <div className="card-text">
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">100% Cotton</span>
-                                    </div>
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">Breathable Fabric</span>
-                                    </div>
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">260gsm</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="card-footer">
-                                <div className="text-center">
-                                    <a href="/product" className="btn btn-dark roboto m-auto">View Details</a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="card">
-                            {/* <!-- product image   --> */}
-                            <img src={product.scarf} className="card-img-top" alt="" />
-
-                            <div className="cardPrice">
-                                <span className="priceBox fw-bold text-dark">
-                                    &#8377;<span className="price fw-bold text-dark">349</span>/-
-                                </span>
-                            </div>
-                            <button className="btn btn-wishlist" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                data-bs-title="Add to wishlist">
-                                <FontAwesomeIcon icon={faHeart} />
-                            </button>
-                            <div className="card-header">
-                                {/* <!-- product name  --> */}
-                                <h5 className="card-title">Geometric print Scarf</h5>
-
-                            </div>
-
-                            <div className="card-body">
-                                {/* <!-- key points  --> */}
-                                <div className="card-text">
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">100% Cotton</span>
-                                    </div>
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">Breathable Fabric</span>
-                                    </div>
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">260gsm</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="card-footer">
-                                <div className="text-center">
-                                    <a href="/product" className="btn btn-dark roboto m-auto">View Details</a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="card onHot">
-                            {/* <!-- product image   --> */}
-                            <img src={product.dress} className="card-img-top" alt="" />
-                            <div className="cardPrice">
-                                <span className="priceBox fw-bold text-dark">
-                                    &#8377;<span className="price fw-bold text-dark">2499</span>/-
-                                </span>
-                            </div>
-                            <button className="btn btn-wishlist" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                data-bs-title="Add to wishlist">
-                                <FontAwesomeIcon icon={faHeart} />
-                            </button>
-                            <div className="card-header">
-                                {/* <!-- product name  --> */}
-                                <h5 className="card-title">Basic Dress Green</h5>
-
-                            </div>
-                            <div className="card-body">
-                                {/* <!-- key points  --> */}
-                                <div className="card-text">
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">100% Cotton</span>
-                                    </div>
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">Breathable Fabric</span>
-                                    </div>
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">260gsm</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="card-footer">
-                                <div className="text-center">
-                                    <a href="/product" className="btn btn-dark roboto m-auto">View Details</a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="card onSale">
-                            {/* <!-- product image   --> */}
-                            <img src={product.airZoom} className="card-img-top" alt="" />
-                            <div className="cardPrice">
-                                <span className="priceBox fw-bold text-dark">
-                                    <span className="text-decoration-line-through hotcolor pe-3">
-                                        &#8377;<span className="price fw-bold hotcolor">2999</span>/
-                                    </span>
-                                    &#8377;<span className="price fw-bold text-dark">1989</span>/-
-                                </span>
-                            </div>
-                            <button className="btn btn-wishlist" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                data-bs-title="Add to wishlist">
-                                <FontAwesomeIcon icon={faHeart} />
-                            </button>
-                            <div className="card-header">
-                                {/* <!-- product name  --> */}
-                                <h5 className="card-title">Nike Air Zoom Pegasus</h5>
-
-                            </div>
-                            <div className="card-body">
-                                {/* <!-- key points  --> */}
-                                <div className="card-text">
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">100% Cotton</span>
-                                    </div>
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">Breathable Fabric</span>
-                                    </div>
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">260gsm</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="card-footer">
-                                <div className="text-center">
-                                    <a href="/product" className="btn btn-dark roboto m-auto">View Details</a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="card">
-                            {/* <!-- product image   --> */}
-                            <img src={product.repelmiler} className="card-img-top" alt="" />
-                            <div className="cardPrice">
-                                <span className="priceBox fw-bold text-dark">
-                                    &#8377;<span className="price fw-bold text-dark">1699</span>/-
-                                </span>
-                            </div>
-                            <button className="btn btn-wishlist" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                data-bs-title="Add to wishlist">
-                                <FontAwesomeIcon icon={faHeart} />
-                            </button>
-                            <div className="card-header">
-                                {/* <!-- product name  --> */}
-                                <h5 className="card-title">Nike Repel Miler</h5>
-                            </div>
-                            <div className="card-body">
-                                {/* <!-- key points  --> */}
-                                <div className="card-text">
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">100% Cotton</span>
-                                    </div>
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">Breathable Fabric</span>
-                                    </div>
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">260gsm</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="card-footer">
-                                <div className="text-center">
-                                    <a href="/product" className="btn btn-dark roboto m-auto">View Details</a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="card">
-                            {/* <!-- product image   --> */}
-                            <img src={product.glass} className="card-img-top" alt="" />
-                            <div className="cardPrice">
-                                <span className="priceBox fw-bold text-dark">
-                                    &#8377;<span className="price fw-bold text-dark">2349</span>/-
-                                </span>
-                            </div>
-                            <button className="btn btn-wishlist" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                data-bs-title="Add to wishlist">
-                                <FontAwesomeIcon icon={faHeart} />
-                            </button>
-                            <div className="card-header">
-                                {/* <!-- product name  --> */}
-                                <h5 className="card-title">Buffet vision</h5>
-                            </div>
-                            <div className="card-body">
-
-                                {/* <!-- key points  --> */}
-                                <div className="card-text">
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">100% Cotton</span>
-                                    </div>
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">Breathable Fabric</span>
-                                    </div>
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">260gsm</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="card-footer">
-                                <div className="text-center">
-                                    <a href="/product" className="btn btn-dark roboto m-auto">View Details</a>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div className="card onSale">
-                            {/* <!-- product image   --> */}
-                            <img src={product.hoodie} className="card-img-top" alt="" />
-
-                            <div className="cardPrice">
-                                <span className="priceBox fw-bold text-dark">
-                                    <span className="text-decoration-line-through hotcolor pe-3">
-                                        &#8377;<span className="price fw-bold hotcolor">2599</span>/
-                                    </span>
-                                    &#8377;<span className="price fw-bold text-dark">1599</span>/-
-                                </span>
-                            </div>
-                            <button className="btn btn-wishlist" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                data-bs-title="Add to wishlist">
-                                <FontAwesomeIcon icon={faHeart} />
-                            </button>
-                            <div className="card-header">
-                                {/* <!-- product name  --> */}
-                                <h5 className="card-title">Yellow Reserved Hoodie</h5>
-                            </div>
-                            <div className="card-body">
-                                {/* <!-- key points  --> */}
-                                <div className="card-text">
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">100% Cotton</span>
-                                    </div>
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">Breathable Fabric</span>
-                                    </div>
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">260gsm</span>
-                                    </div>
-                                </div>
-
-                            </div>
-                            <div className="card-footer">
-                                <div className="text-center">
-                                    <a href="/product" className="btn btn-dark roboto m-auto">View Details</a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="card">
-                            {/* <!-- product image   --> */}
-                            <img src={product.jogger} className="card-img-top" alt="" />
-
-                            <div className="cardPrice">
-                                <span className="priceBox fw-bold text-dark">
-                                    &#8377;<span className="price fw-bold text-dark">549</span>/-
-                                </span>
-                            </div>
-                            <button className="btn btn-wishlist" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                data-bs-title="Add to wishlist">
-                                <FontAwesomeIcon icon={faHeart} />
-                            </button>
-                            <div className="card-header">
-                                {/* <!-- product name  --> */}
-                                <h5 className="card-title">Adicolor Classics Joggers</h5>
-                            </div>
-                            <div className="card-body">
-                                {/* <!-- key points  --> */}
-                                <div className="card-text">
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">100% Cotton</span>
-                                    </div>
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">Breathable Fabric</span>
-                                    </div>
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">260gsm</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="card-footer">
-                                <div className="text-center">
-                                    <a href="/product" className="btn btn-dark roboto m-auto">View Details</a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="card">
-                            {/* <!-- product image   --> */}
-                            <img src={product.futuraLuxe} className="card-img-top" alt="" />
-
-                            <div className="cardPrice">
-                                <span className="priceBox fw-bold text-dark">
-                                    &#8377;<span className="price fw-bold text-dark">2199</span>/-
-                                </span>
-                            </div>
-                            <button className="btn btn-wishlist" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                data-bs-title="Add to wishlist">
-                                <FontAwesomeIcon icon={faHeart} />
-                            </button>
-                            <div className="card-header">
-                                {/* <!-- product name  --> */}
-                                <h5 className="card-title">Nike Sportswear Futura Luxe</h5>
-
-                            </div>
-
-                            <div className="card-body">
-                                {/* <!-- key points  --> */}
-                                <div className="card-text">
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">100% Cotton</span>
-                                    </div>
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">Breathable Fabric</span>
-                                    </div>
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">260gsm</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="card-footer">
-                                <div className="text-center">
-                                    <a href="/product" className="btn btn-dark roboto m-auto">View Details</a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="card">
-                            {/* <!-- product image   --> */}
-                            <img src={product.scarf} className="card-img-top" alt="" />
-
-                            <div className="cardPrice">
-                                <span className="priceBox fw-bold text-dark">
-                                    &#8377;<span className="price fw-bold text-dark">349</span>/-
-                                </span>
-                            </div>
-                            <button className="btn btn-wishlist" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                data-bs-title="Add to wishlist">
-                                <FontAwesomeIcon icon={faHeart} />
-                            </button>
-                            <div className="card-header">
-                                {/* <!-- product name  --> */}
-                                <h5 className="card-title">Geometric print Scarf</h5>
-
-                            </div>
-
-                            <div className="card-body">
-                                {/* <!-- key points  --> */}
-                                <div className="card-text">
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">100% Cotton</span>
-                                    </div>
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">Breathable Fabric</span>
-                                    </div>
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">260gsm</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="card-footer">
-                                <div className="text-center">
-                                    <a href="/product" className="btn btn-dark roboto m-auto">View Details</a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="card onHot">
-                            {/* <!-- product image   --> */}
-                            <img src={product.dress} className="card-img-top" alt="" />
-                            <div className="cardPrice">
-                                <span className="priceBox fw-bold text-dark">
-                                    &#8377;<span className="price fw-bold text-dark">2499</span>/-
-                                </span>
-                            </div>
-                            <button className="btn btn-wishlist" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                data-bs-title="Add to wishlist">
-                                <FontAwesomeIcon icon={faHeart} />
-                            </button>
-                            <div className="card-header">
-                                {/* <!-- product name  --> */}
-                                <h5 className="card-title">Basic Dress Green</h5>
-
-                            </div>
-                            <div className="card-body">
-                                {/* <!-- key points  --> */}
-                                <div className="card-text">
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">100% Cotton</span>
-                                    </div>
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">Breathable Fabric</span>
-                                    </div>
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">260gsm</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="card-footer">
-                                <div className="text-center">
-                                    <a href="/product" className="btn btn-dark roboto m-auto">View Details</a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="card onSale">
-                            {/* <!-- product image   --> */}
-                            <img src={product.airZoom} className="card-img-top" alt="" />
-                            <div className="cardPrice">
-                                <span className="priceBox fw-bold text-dark">
-                                    <span className="text-decoration-line-through hotcolor pe-3">
-                                        &#8377;<span className="price fw-bold hotcolor">2999</span>/
-                                    </span>
-                                    &#8377;<span className="price fw-bold text-dark">1989</span>/-
-                                </span>
-                            </div>
-                            <button className="btn btn-wishlist" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                data-bs-title="Add to wishlist">
-                                <FontAwesomeIcon icon={faHeart} />
-                            </button>
-                            <div className="card-header">
-                                {/* <!-- product name  --> */}
-                                <h5 className="card-title">Nike Air Zoom Pegasus</h5>
-
-                            </div>
-                            <div className="card-body">
-                                {/* <!-- key points  --> */}
-                                <div className="card-text">
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">100% Cotton</span>
-                                    </div>
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">Breathable Fabric</span>
-                                    </div>
-                                    <div className="pointKeysCard">
-                                        <span><FontAwesomeIcon icon={faHandPointRight} className='me-1' /></span>
-                                        <span className="keys">260gsm</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="card-footer">
-                                <div className="text-center">
-                                    <a href="/product" className="btn btn-dark roboto m-auto">View Details</a>
-                                </div>
-                            </div>
-                        </div>
-
-
-                    </div>
-
+                </div>
+                {products.length > 4 &&
                     <div className="text-left my-3 pt-4 border-top">
                         <button
                             className="mt-3 btn goBackBtn whiteIcon roboto btn-dark d-flex align-items-center justify-content-center"
-                            onclick="history.back()">
-                            <FontAwesomeIcon icon={faLeftLong} className='me-2' />
-                            <span className="text-light roboto" onClick={goBack}>Go back</span>
+                            onClick={() => navigate(-1)}
+                        >
+                            <FontAwesomeIcon icon={faLeftLong} className="me-2" />
+                            <span className="text-light roboto">Go back</span>
                         </button>
                     </div>
+                }
+            </div>
+        </section>
+    );
+};
 
-                </div>
-            </section>
-        </>
-    )
-}
-
-export default ShowProducts
+export default ShowProducts;

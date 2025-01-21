@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Tooltip } from 'bootstrap';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
-import Loader from '../../../components/loader/loader';
 import TimeNow from '../../../components/timer/TimeNow';
 import CategoryAdd from '../../../modals/categoryModal/CategoryAdd';
 import UpdateCategory from '../../../modals/updateCategory/UpdateCategory';
@@ -23,6 +22,7 @@ import { getCategories, delCategory, updateCategory } from '../../../services/ap
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../categoryList/category.css';
+import Loader from '../../../components/loader/Loader';
 
 const CategoryList = () => {
     const [categoryId, setCategoryId] = useState('')
@@ -263,12 +263,6 @@ const CategoryList = () => {
                             value={searchQuery}
                             onChange={handleSearchChange}
                         />
-                        {/* <button
-                            className="input-group-text"
-                            onClick={() => fetchCategories(1)} // Fetch with search query
-                        >
-                            <FontAwesomeIcon icon={faMagnifyingGlass} />
-                        </button> */}
                     </form>
                 </div>
                 <div className="col-12 col-xl-6 d-flex justify-content-end">

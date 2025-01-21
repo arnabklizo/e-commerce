@@ -7,7 +7,7 @@ import '../previewProduct/previewProduct.css';
 import { toast } from 'react-toastify';
 import { getProduct } from '../../../services/api';
 import { useParams } from "react-router-dom";
-import Loader from '../../../components/loader/loader';
+import Loader from '../../../components/loader/Loader';
 import parse from 'html-react-parser';
 
 

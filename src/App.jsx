@@ -86,7 +86,7 @@ function App() {
             }
           />
           <Route
-            path="/showroducts"
+            path="/showroducts/:id"
             element={
               <Layout>
                 <ShowProducts />
@@ -94,7 +94,7 @@ function App() {
             }
           />
           <Route
-            path="/product"
+            path="/product/:id"
             element={
               <Layout>
                 <Product />
