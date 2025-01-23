@@ -62,9 +62,9 @@ export const updateProduct = (id, formData) => API.put(`/products/${id}`, formDa
 
 
 //get productsByCategory
-export const getProductsByCategory = (id, filterSearch) => API.get(`/products/category/${id}`, {
+export const getProductsByCategory = (id, productFor) => API.get(`/products/category/${id}`, {
     params: {
-        filterSearch,
+        productFor,
     },
 });
 

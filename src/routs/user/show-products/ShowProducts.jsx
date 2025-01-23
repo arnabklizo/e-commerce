@@ -9,7 +9,9 @@ import { Link } from 'react-router-dom';
 
 
 const ShowProducts = () => {
-    const [filterSearch, setFilterSearch] = useState('all')
+    const [filter, setFilter] = useState()
+    const [category, setCategory] = useState()
+    const [productFor, setProductFor] = useState('')
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
@@ -25,20 +27,30 @@ const ShowProducts = () => {
         const fetchProducts = async () => {
             try {
                 setLoading(true);
-                const response = await getProductsByCategory(id, filterSearch);
-                setProducts(response.data.products);
+                const response = await getProductsByCategory(id, productFor);
+
+                setCategory(response.data.category);
+
+                const fetchedProducts = response.data.products;
+                setProducts(fetchedProducts);
+
+                // Log unique productFor types
+                if (filter === undefined) {
+                    const productForTypes = [...new Set(fetchedProducts.map(product => product.productFor))];
+                    setFilter(productForTypes);
+                }
+
             } catch (error) {
-                console.error('Failed to fetch categories:', error);
+                console.error('Failed to fetch categories :', error);
             } finally {
                 setLoading(false);
             }
         };
-
         fetchProducts();
-    }, [id, filterSearch]);
+    }, [id, productFor]);
 
     const handleFilterChange = (e) => {
-        setFilterSearch(e.target.value);
+        setProductFor(e.target.value);
     }
 
     const renderPrice = (product) => {
@@ -60,34 +72,39 @@ const ShowProducts = () => {
         <section className="showAllProducts">
             <div className="container">
                 <div className="allProdctFiltSect d-flex py-2 justify-content-between align-items-center mb-5 border-bottom">
-                    <button
-                        className="btn goBackBtn whiteIcon roboto btn-dark d-flex align-items-center justify-content-center"
-                        onClick={() => navigate(-1)}
-                    >
-                        <FontAwesomeIcon icon={faLeftLong} className="me-2" />
-                        <span className="text-light roboto">Go back</span>
-                    </button>
-
-                    <h1 className="text-center roboto fs-4">All Products</h1>
-
-                    <div className="filterBox d-flex align-items-center">
-                        <label htmlFor="filterCategory" className="me-2 fw-bold">
-                            <FontAwesomeIcon icon={faFilter} className="me-1" />
-                            Short by:
-                        </label>
-                        <select
-                            id="filterCategory"
-                            className="form-select w-50"
-                            aria-label="Default select example"
-                            onClick={handleFilterChange}
+                    <div className='w-300'>
+                        <button
+                            className="btn goBackBtn whiteIcon roboto btn-dark d-flex align-items-center justify-content-center"
+                            onClick={() => navigate(-1)}
                         >
-                            <option value="" defaultValue>
-                                All products
-                            </option>
-                            <option value="men">Men</option>
-                            <option value="women">Women</option>
-                            <option value="unisex">Unisex</option>
-                        </select>
+                            <FontAwesomeIcon icon={faLeftLong} className="me-2" />
+                            <span className="text-light roboto">Go back</span>
+                        </button>
+                    </div>
+
+                    <h1 className="text-center roboto fs-4">{category ? category : 'All Products'}</h1>
+
+                    <div className="filterBox d-flex align-items-center w-300 justify-content-end">
+                        {filter && filter.length > 1 && <>
+                            <label htmlFor="filterCategory" className="me-2 fw-bold">
+                                <FontAwesomeIcon icon={faFilter} className="me-1" />
+                                Short by:
+                            </label>
+                            <select
+                                id="filterCategory"
+                                className="form-select w-50"
+                                aria-label="Default select example"
+                                onChange={handleFilterChange}
+                            >
+                                <option value="" defaultValue>
+                                    All products
+                                </option>
+                                {console.log(filter)}
+                                {filter.map((selector) => (
+                                    <option value={selector}>{selector.toUpperCase()}</option>
+                                ))}
+                            </select>
+                        </>}
                     </div>
                 </div>
 

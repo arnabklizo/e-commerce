@@ -251,8 +251,6 @@ const AllProducts = () => {
 
     return (
         <div className="container dashBoardContainer">
-            {console.log('products:', products)}
-
             <h1 className="text-center py-3 roboto sectHead text-capitalize text-dark">All Products</h1>
             <div className="d-flex justify-content-between align-items-center py-3">
                 <TimeNow />
@@ -291,7 +289,7 @@ const AllProducts = () => {
             </div>
             <div className="d-flex border rounded align-items-center justify-content-between p-2 px-3 mt-3 bg-light mb-2">
                 <div className="productNumbers text-dark fw-bolder">
-                    <span className="fw-bold">{count}</span> Products
+                    {/* All Products <span className="fw-bold">({count})</span> */}
                 </div>
                 <FooterPagination />
             </div>
