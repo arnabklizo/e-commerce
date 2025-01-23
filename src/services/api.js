@@ -2,7 +2,7 @@ import axios from "axios";
 
 
 const API = axios.create({
-    baseURL: "http://localhost:5000/api",
+    baseURL: "http://localhost:5000/",
     withCredentials: true,
 });
 
@@ -25,10 +25,12 @@ API.interceptors.response.use(
 export const loginUser = (data) => API.post("/auth/login", data); // Login user
 export const registerUser = (data) => API.post("/auth/register", data); // Register user
 export const logoutUser = () => API.post("/auth/logout"); // Logout user
+export const isUser = () => API.get("/auth/isAuthenticated");
 
 // Admin Authentication
 export const loginAdmin = (data) => API.post("/admin/login", data); // Login admin (requires email and password)
 export const logoutAdmin = () => API.post("/admin/logout"); // Logout admin 
+export const isAdmin = () => API.get("/admin/isAuthenticated");
 
 // for category
 export const addCategory = (data) => API.post("/admin/categories", data, { headers: { "Content-Type": "multipart/form-data" } });

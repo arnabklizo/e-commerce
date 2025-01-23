@@ -3,8 +3,6 @@ import { Icon } from "../../constans/icon.js";
 import { Link, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { Tooltip } from "bootstrap";
-import { logoutAdmin } from "../../services/api.js";
-import { toast } from "react-toastify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faMagnifyingGlass,
@@ -14,24 +12,18 @@ import {
     faRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
 import "../navbar/navbar.css";
-import Cookies from "js-cookie"; // Import js-cookie for cookie handling
 
-const NavbarModal = ({ admin, onCartToggle, onLoginToggle, isLoggedIn, onLogout }) => {
+const NavbarModal = ({
+    admin,
+    onCartToggle,
+    onLoginToggle,
+    isLoggedIn,
+    onUserLogout,
+    onAdminLogout,
+    isAdminLogedIn
+}) => {
     const navigate = useNavigate();
 
-    const handleLogout = async () => {
-        try {
-            await logoutAdmin();
-            // Remove token from cookies if it's there
-            Cookies.remove("adminToken");  // Make sure the token is removed from client-side cookies
-            // console.log("Admin logged out successfully!");
-            toast.success("Admin logged out successfully!");
-            navigate("/adminLogin"); // Redirect to the login page
-        } catch (error) {
-            toast.error("Logout failed. Please try again.");
-            console.error("Logout error:", error);
-        }
-    };
 
 
 
@@ -137,7 +129,7 @@ const NavbarModal = ({ admin, onCartToggle, onLoginToggle, isLoggedIn, onLogout 
                                             data-bs-toggle="tooltip"
                                             data-bs-placement="bottom"
                                             title="Logout"
-                                            onClick={onLogout}
+                                            onClick={onUserLogout}
                                         >
                                             <button className="btn btnAcc">
                                                 <FontAwesomeIcon icon={faRightFromBracket} />
@@ -182,36 +174,40 @@ const NavbarModal = ({ admin, onCartToggle, onLoginToggle, isLoggedIn, onLogout 
                                         </button>
                                     </form>
                                 </li>
-                                <li className="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Profile">
-                                    <Link className="btn btnAcc" to="/adminProfile">
-                                        <FontAwesomeIcon icon={faUser} />
-                                    </Link>
-                                </li>
-                                <li className="nav-item dropdown">
-                                    <button
-                                        className="btn btn-secondary dropdown-toggle"
-                                        onClick={dropdownTogggler}
-                                        id="navbarDropdown"
-                                        data-bs-toggle="dropdown"
-                                        aria-expanded={isDropped ? "true" : "false"}
-                                    >
-                                        Admin Panel
-                                    </button>
-                                    <ul
-                                        className={`dropdown-menu mt-1 ${isDropped ? "show" : ""}`}
-                                        aria-labelledby="navbarDropdown"
-                                    >
-                                        <li className={`nav-item `} data-bs-toggle="tooltip" data-bs-placement="bottom" title="Logout"
-                                            onClick={handleLogout}
-                                        >
-                                            <button className="btn btnAcc">
-                                                Logout
-                                                <FontAwesomeIcon icon={faRightFromBracket} className="ms-2" />
-                                            </button>
+                                {isAdminLogedIn &&
+                                    <>
+                                        <li className="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Profile">
+                                            <Link className="btn btnAcc" to="/adminProfile">
+                                                <FontAwesomeIcon icon={faUser} />
+                                            </Link>
                                         </li>
+                                        <li className="nav-item dropdown">
+                                            <button
+                                                className="btn btn-secondary dropdown-toggle"
+                                                onClick={dropdownTogggler}
+                                                id="navbarDropdown"
+                                                data-bs-toggle="dropdown"
+                                                aria-expanded={isDropped ? "true" : "false"}
+                                            >
+                                                Admin Panel
+                                            </button>
+                                            <ul
+                                                className={`dropdown-menu mt-1 ${isDropped ? "show" : ""}`}
+                                                aria-labelledby="navbarDropdown"
+                                            >
+                                                <li className={`nav-item `} data-bs-toggle="tooltip" data-bs-placement="bottom" title="Logout"
+                                                    onClick={onAdminLogout}
+                                                >
+                                                    <button className="btn btnAcc">
+                                                        Logout
+                                                        <FontAwesomeIcon icon={faRightFromBracket} className="ms-2" />
+                                                    </button>
+                                                </li>
 
-                                    </ul>
-                                </li>
+                                            </ul>
+                                        </li>
+                                    </>
+                                }
                             </ul>
                         </div>
                     </div>

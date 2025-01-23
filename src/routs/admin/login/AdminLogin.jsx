@@ -38,11 +38,9 @@ const AdminLogin = () => {
         try {
             const adminCredentials = { email, password };
             const { data } = await loginAdmin(adminCredentials);
-
-            // Save token in cookies (set expiration time for the cookie)
-            Cookies.set("adminToken", data.token, { expires: 1 }); // expires in 1 day
-            toast.success("Logged in successfully!");
-            navigate("/dashboard");  // Redirect after login success
+            // console.log(data.message)
+            toast.success(data.message);
+            navigate("/dashboard");
         } catch (error) {
             if (error.response) {
                 // If there's a response error from the API

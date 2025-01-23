@@ -25,13 +25,13 @@ const Dashboard = () => {
 
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const token = Cookies.get('adminToken');
-        // console.log(token)
-        if (!token) {
-            navigate("/adminLogin");
-        }
-    }, [navigate]);
+    // useEffect(() => {
+    //     const token = Cookies.get('adminToken');
+    //     // console.log(token)
+    //     if (!token) {
+    //         navigate("/adminLogin");
+    //     }
+    // }, [navigate]);
 
 
 

@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { loginUser } from "../../services/api";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEyeSlash, faEye } from "@fortawesome/free-solid-svg-icons";
 import { faFacebookF, faGoogle, faApple } from "@fortawesome/free-brands-svg-icons";
-import Cookies from "js-cookie";
 import "../LoginModal/LoginModal.css";
 
 const LoginModal = ({ isVisible, onClose, onSignToggle, onForgotToggle, onLoginSuccess }) => {
@@ -12,28 +11,25 @@ const LoginModal = ({ isVisible, onClose, onSignToggle, onForgotToggle, onLoginS
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
 
-    // Handle form submission for login
+    // user login
     const handleSubmit = async (e) => {
-
         e.preventDefault();
         try {
-            const { data } = await loginUser({ email, password });
-            console.log('this is data', data)
-            if (data?.token) {
-                Cookies.set("token", data.token, { expires: 1 }); // Ensure the token is set correctly
-                toast.success(`Login successful!  Welcome back`);
-                onLoginSuccess();
-                onClose();
-            } else {
-                toast.error("Token missing in server response.");
-            }
+            const response = await loginUser({ email, password });
+            // console.log('this is data', response);
+            toast.success(response.data.message);
+
+            // if (response?.token) {
+            //     console.log(hi)
+            // } else {
+            //     toast.error("Token missing in server response.");
+            // }
+
+            onLoginSuccess();
+            onClose();
         } catch (error) {
-            toast.error(error.response?.data?.message || "Login failed.");
+            console.error("Not authenticated:", error);
         }
-
-
-
-
     };
 
     // Toggle password visibility

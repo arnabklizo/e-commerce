@@ -15,12 +15,6 @@ const SignupModal = ({ isVisible, onClose, onLoginToggle, onLoginSuccess }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validate fields
-        if (!email || !phoneNumber || !password) {
-            toast.error("All fields are required", { position: "top-center" });
-            return;
-        }
-
         // Password length validation
         if (password.length < 6) {
             toast.error("Password must be at least 6 characters long", { position: "top-center" });
@@ -29,14 +23,12 @@ const SignupModal = ({ isVisible, onClose, onLoginToggle, onLoginSuccess }) => {
 
         try {
             const { data } = await registerUser({ email, phone: phoneNumber, password });
-            toast.success("Successfully registered! Please log in.");
             onClose();
-
             // Attempt auto-login after successful registration
             const loginResponse = await loginUser({ email, password });
             Cookies.set("token", loginResponse.data.token, { expires: 1 });
             onLoginSuccess();
-            toast.success("Logged in successfully!");
+            toast.success("Signed up & Logged in successfully!");
         } catch (error) {
             toast.error(error.response?.data?.message || "Registration failed.");
         }
@@ -92,6 +84,7 @@ const SignupModal = ({ isVisible, onClose, onLoginToggle, onLoginSuccess }) => {
                                     className="form-control"
                                     name="emailAddress"
                                     id="emailAddress"
+                                    placeholder="Email Address"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     required
@@ -100,7 +93,7 @@ const SignupModal = ({ isVisible, onClose, onLoginToggle, onLoginSuccess }) => {
                             </div>
                             <div className="form-floating mb-3">
                                 <input
-                                    type="tel"
+                                    type='number'
                                     className="form-control"
                                     name="phoneNumber"
                                     id="phoneNumber"

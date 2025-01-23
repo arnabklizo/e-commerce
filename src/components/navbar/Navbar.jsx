@@ -1,6 +1,5 @@
 import { logoutUser, logoutAdmin } from "../../services/api";
 import React, { useState, useEffect } from 'react';
-import Cookies from "js-cookie";
 import { ToastContainer, toast } from "react-toastify";
 import NavbarModal from '../../modals/navbar/NavbarModal';
 import Cartmodal from '../../modals/cartModal/Cartmodal';
@@ -10,14 +9,42 @@ import ForgotModal from '../../modals/forgotModal/ForgotModal';
 import { Tooltip } from 'bootstrap';
 import { useNavigate } from "react-router-dom";
 
+import { isUser, isAdmin } from "../../services/api";
 const Navbar = ({ admin }) => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    useEffect(() => {
-        const token = Cookies.get("token");
-        // console.log("Token from Cookies:", token); // Debugging statement
-        setIsLoggedIn(!!token);
-    }, []);
+    const navigate = useNavigate();
+    const [isLoggedIn, setIsLoggedIn] = useState(false); //for user
+    const [isAdminLogedIn, setAdminLogedIn] = useState(false); //for admin 
 
+    //check user loged in
+    const checkUserAuth = async () => {
+        try {
+            const response = await isUser();
+            const { isAuthenticated } = await response.data;
+            setIsLoggedIn(isAuthenticated);
+        } catch (err) {
+            setIsLoggedIn(false);
+        }
+    };
+
+    //check admin logged in
+    const checkAdminAuth = async () => {
+        try {
+            const response = await isAdmin();
+            // console.log('response,', response)
+            const { isAuthenticated } = await response.data;
+            setAdminLogedIn(isAuthenticated);
+        } catch (err) {
+            setAdminLogedIn(false);
+        }
+    };
+
+    //check user and admin logged in
+    useEffect(() => {
+        checkUserAuth();
+        checkAdminAuth();
+    }, [navigate]);
+
+    //tooltip 
     useEffect(() => {
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
         const tooltips = Array.from(tooltipTriggerList).map(
@@ -34,17 +61,20 @@ const Navbar = ({ admin }) => {
         setCartVisible(!isCartVisible);
     };
 
+
     // Modals visibility state
     const [isLoginModalVisible, setLoginModalVisible] = useState(false);
     const toggleLoginModal = () => {
         setLoginModalVisible(!isLoginModalVisible);
     };
 
+    // for login modal 
     const [isSignModalVisible, setSignModalVisible] = useState(false);
     const toggleSignupModal = () => {
         setSignModalVisible(!isSignModalVisible)
     }
 
+    // for forgot password modal 
     const [isForgotVisible, setForgot] = useState(false);
     const toggloForgotModal = () => {
         setForgot(!isForgotVisible)
@@ -63,21 +93,28 @@ const Navbar = ({ admin }) => {
     }, [isLoginModalVisible || isSignModalVisible || isForgotVisible]);
 
     // Handle logout by removing token and updating the state
-    const handleLogout = async () => {
-        await logoutUser();  // Call API to log out
-        Cookies.remove("token");
-        setIsLoggedIn(false);
-        toast.success("Successfully logged out!", { position: "top-center" });
-        // console.log('logout');
-        window.location.href = '/';  // Redirect to login page
+    const handleUserLogout = async () => {
+        await logoutUser()
+        toast.success("Logged out successfully");
+        checkUserAuth();
+        navigate("/");
     };
 
-
-
-
-    const handleLoginSuccess = () => {
-        setIsLoggedIn(true);
+    // Handle admin logout
+    const handleAdminLogout = async () => {
+        try {
+            const response = await logoutAdmin();
+            checkAdminAuth();
+            toast.success(response.message);
+            navigate("/adminLogin");
+        } catch (error) {
+            toast.error("Logout failed. Please try again.");
+            console.error("Logout error:", error);
+        }
     };
+
+    // Handle login success
+    const handleLoginSuccess = () => (setIsLoggedIn(true));
 
     return (
         <>
@@ -86,7 +123,9 @@ const Navbar = ({ admin }) => {
                 onCartToggle={toggleCart}
                 onLoginToggle={toggleLoginModal}
                 isLoggedIn={isLoggedIn}  // Pass logged-in state to NavbarModal
-                onLogout={handleLogout}  // Pass logout handler to NavbarModal
+                onUserLogout={handleUserLogout}  // Pass logout handler to NavbarModal
+                isAdminLogedIn={isAdminLogedIn}
+                onAdminLogout={handleAdminLogout}
             />
             <Cartmodal isVisible={isCartVisible} onClose={() => setCartVisible(false)} />
             <LoginModal
