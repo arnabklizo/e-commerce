@@ -55,7 +55,7 @@ const Profile = () => {
                 ...address,
             }));
 
-            await updateUser(profile._id, updatedProfile);
+            await updateUser(profile._id, updatedProfile, profilePicture);
             setBtnVisible(false); // Hide the button after successful save
             toast.success('Profile updated successfully');
         } catch (error) {
