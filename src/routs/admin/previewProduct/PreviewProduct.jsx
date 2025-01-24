@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Cookies from 'js-cookie';
+import { isAdmin } from '../../../services/api';
 import { useNavigate } from 'react-router-dom';
 import { faCircleDot, faLeftLong } from '@fortawesome/free-solid-svg-icons';
 import '../previewProduct/previewProduct.css';
@@ -14,7 +14,6 @@ import parse from 'html-react-parser';
 const PreviewProduct = () => {
     const [loading, setLoading] = useState(true);
     const [productItem, setProductItem] = useState('');
-    const [count, setCount] = useState(0);
 
     const { id } = useParams();
     if (!id) {
@@ -45,10 +44,18 @@ const PreviewProduct = () => {
 
 
     useEffect(() => {
-        const token = Cookies.get('adminToken');
-        if (!token) {
-            navigate("/adminLogin");
-        }
+        const checkAuth = async () => {
+            try {
+                const adminResponse = await isAdmin();
+                if (!adminResponse.data.isAuthenticated) {
+                    navigate("/dashboard");
+                }
+            } catch (err) {
+                navigate("/adminLogin");
+            }
+        };
+
+        checkAuth();
     }, [navigate]);
 
     return (

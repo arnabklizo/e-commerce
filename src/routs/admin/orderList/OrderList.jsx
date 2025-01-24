@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Tooltip } from "bootstrap";
 
 import { useNavigate } from 'react-router-dom';
-import Cookies from 'js-cookie';
+import { isAdmin } from '../../../services/api';
 
 import TimeNow from '../../../components/timer/TimeNow';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -24,13 +24,19 @@ const OrderList = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const token = Cookies.get('adminToken');
-        // console.log(token)
-        if (!token) {
-            navigate("/adminLogin");
-        }
-    }, [navigate]);
+        const checkAuth = async () => {
+            try {
+                const adminResponse = await isAdmin();
+                if (!adminResponse.data.isAuthenticated) {
+                    navigate("/dashboard");
+                }
+            } catch (err) {
+                navigate("/adminLogin");
+            }
+        };
 
+        checkAuth();
+    }, [navigate]);
 
 
     const [isSelected, setSelected] = useState()

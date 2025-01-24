@@ -32,8 +32,12 @@ const NewProduct = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const token = Cookies.get('adminToken');
-        if (!token) return navigate("/adminLogin");
+        const checkAuth = async () => {
+            const adminResponse = await isAdmin();
+            if (!adminResponse.data.isAuthenticated) {
+                navigate("/adminLogin");
+            }
+        };
 
         const fetchData = async () => {
             try {
@@ -48,7 +52,7 @@ const NewProduct = () => {
         };
         fetchData();
 
-
+        checkAuth();
 
     }, [navigate]);
 

@@ -2,15 +2,13 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Tooltip } from "bootstrap";
 import { useNavigate } from 'react-router-dom';
-import Cookies from 'js-cookie';
+import { isAdmin } from '../../../services/api';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faMagnifyingGlass,
     faClipboardList,
-    faPencil,
     faTrashCan,
-    faEye,
     faArrowDownZA,
     faArrowDownWideShort,
     faArrowDownShortWide,
@@ -27,14 +25,14 @@ const AllUsers = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const token = Cookies.get('adminToken');
-        // console.log(token)
-        if (!token) {
-            navigate("/adminLogin");
-        }
+        const checkAuth = async () => {
+            const adminResponse = await isAdmin();
+            if (!adminResponse.data.isAuthenticated) {
+                navigate("/adminLogin");
+            }
+        };
+        checkAuth();
     }, [navigate]);
-
-
 
 
     useEffect(() => {

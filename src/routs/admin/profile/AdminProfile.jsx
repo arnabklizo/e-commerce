@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Cookies from 'js-cookie';
-
+import { isAdmin } from "../../../services/api";
 import "../profile/adminProfile.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate } from "react-router-dom";
@@ -71,11 +70,18 @@ const AdminTable = ({ data, onToggle }) => (
 const AdminProfile = () => {
     const navigate = useNavigate();
     useEffect(() => {
-        const token = Cookies.get('adminToken');
-        // console.log(token)
-        if (!token) {
-            navigate("/adminLogin");
-        }
+        const checkAuth = async () => {
+            try {
+                const adminResponse = await isAdmin();
+                if (!adminResponse.data.isAuthenticated) {
+                    navigate("/dashboard");
+                }
+            } catch (err) {
+                navigate("/adminLogin");
+            }
+        };
+
+        checkAuth();
     }, [navigate]);
 
 

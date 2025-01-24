@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { Tooltip } from 'bootstrap';
 import { useNavigate } from 'react-router-dom';
-import Cookies from 'js-cookie';
+import { isUser } from '../../../services/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLeftLong, faCartPlus, faShirt, faHandPointRight } from '@fortawesome/free-solid-svg-icons';
 import { product } from '../../../constans/product';
@@ -10,11 +10,14 @@ import './wishlist.css'
 const Wishlist = () => {
     const navigate = useNavigate();
     useEffect(() => {
-        const token = Cookies.get('token');
-        console.log(token)
-        if (!token) {
-            navigate("/");
-        }
+        const checkAuth = async () => {
+            const adminResponse = await isUser();
+            if (!adminResponse.data.isAuthenticated) {
+                navigate("/");
+                toast.error('You are not authorized to view this page');
+            }
+        };
+        checkAuth();
     }, [navigate]);
 
 

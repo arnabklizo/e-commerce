@@ -27,6 +27,10 @@ export const registerUser = (data) => API.post("/auth/register", data); // Regis
 export const logoutUser = () => API.post("/auth/logout"); // Logout user
 export const isUser = () => API.get("/auth/isAuthenticated");
 
+// user profile update
+export const checkMe = () => API.get("/user/me");
+export const updateUser = (id, data) => API.put(`/user/update/${id}`, data);
+
 // Admin Authentication
 export const loginAdmin = (data) => API.post("/admin/login", data); // Login admin (requires email and password)
 export const logoutAdmin = () => API.post("/admin/logout"); // Logout admin 

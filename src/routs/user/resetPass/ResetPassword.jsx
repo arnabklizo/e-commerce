@@ -1,19 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import './resetPassword.css'
 import { useNavigate } from 'react-router-dom';
-import Cookies from 'js-cookie';
+import { isUser } from '../../../services/api';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faLeftLong, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
 const ResetPassword = () => {
     const navigate = useNavigate();
+
     useEffect(() => {
-        const token = Cookies.get('token');
-        console.log(token)
-        if (!token) {
-            navigate("/");
-        }
+        const checkAuth = async () => {
+            const adminResponse = await isUser();
+            if (!adminResponse.data.isAuthenticated) {
+                navigate("/");
+                toast.error('You are not authorized to view this page');
+            }
+        };
+        checkAuth();
     }, [navigate]);
 
 

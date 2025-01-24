@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Tooltip } from 'bootstrap';
 import { useNavigate } from 'react-router-dom';
-import Cookies from 'js-cookie';
+import { isAdmin } from '../../../services/api';
 import TimeNow from '../../../components/timer/TimeNow';
 import CategoryAdd from '../../../modals/categoryModal/CategoryAdd';
 import UpdateCategory from '../../../modals/updateCategory/UpdateCategory';
@@ -22,7 +22,7 @@ import { getCategories, delCategory, updateCategory } from '../../../services/ap
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../categoryList/category.css';
-import Loader from '../../../components/loader/Loader';
+import Loader from '../../../components/loader/loader';
 
 const CategoryList = () => {
     const [categoryId, setCategoryId] = useState('')
@@ -42,8 +42,13 @@ const CategoryList = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const token = Cookies.get('adminToken');
-        if (!token) navigate('/adminLogin');
+        const checkAuth = async () => {
+            const adminResponse = await isAdmin();
+            if (!adminResponse.data.isAuthenticated) {
+                navigate("/adminLogin");
+            }
+        };
+        checkAuth();
     }, [navigate]);
 
     useEffect(() => {

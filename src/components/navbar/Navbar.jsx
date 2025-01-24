@@ -1,6 +1,6 @@
 import { logoutUser, logoutAdmin } from "../../services/api";
 import React, { useState, useEffect } from 'react';
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import NavbarModal from '../../modals/navbar/NavbarModal';
 import Cartmodal from '../../modals/cartModal/Cartmodal';
 import LoginModal from '../../modals/LoginModal/LoginModal';
@@ -8,43 +8,36 @@ import SignupModal from '../../modals/SignupModal/SignupModal';
 import ForgotModal from '../../modals/forgotModal/ForgotModal';
 import { Tooltip } from 'bootstrap';
 import { useNavigate } from "react-router-dom";
-
 import { isUser, isAdmin } from "../../services/api";
+
 const Navbar = ({ admin }) => {
     const navigate = useNavigate();
-    const [isLoggedIn, setIsLoggedIn] = useState(false); //for user
-    const [isAdminLogedIn, setAdminLogedIn] = useState(false); //for admin 
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isAdminLogedIn, setAdminLogedIn] = useState(false);
+    const [isCartVisible, setCartVisible] = useState(false);
+    const [isLoginModalVisible, setLoginModalVisible] = useState(false);
+    const [isSignModalVisible, setSignModalVisible] = useState(false);
+    const [isForgotVisible, setForgot] = useState(false);
 
-    //check user loged in
-    const checkUserAuth = async () => {
+    // Unified check for user and admin authentication
+    const checkAuth = async () => {
         try {
-            const response = await isUser();
-            const { isAuthenticated } = await response.data;
-            setIsLoggedIn(isAuthenticated);
+            const userResponse = await isUser();
+            setIsLoggedIn(userResponse.data.isAuthenticated);
+
+            const adminResponse = await isAdmin();
+            setAdminLogedIn(adminResponse.data.isAuthenticated);
         } catch (err) {
             setIsLoggedIn(false);
-        }
-    };
-
-    //check admin logged in
-    const checkAdminAuth = async () => {
-        try {
-            const response = await isAdmin();
-            // console.log('response,', response)
-            const { isAuthenticated } = await response.data;
-            setAdminLogedIn(isAuthenticated);
-        } catch (err) {
             setAdminLogedIn(false);
         }
     };
 
-    //check user and admin logged in
     useEffect(() => {
-        checkUserAuth();
-        checkAdminAuth();
+        checkAuth();
     }, [navigate]);
 
-    //tooltip 
+    // Tooltip initialization
     useEffect(() => {
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
         const tooltips = Array.from(tooltipTriggerList).map(
@@ -53,68 +46,38 @@ const Navbar = ({ admin }) => {
         return () => {
             tooltips.forEach((tooltip) => tooltip.dispose());
         };
-    }, []);
+    }, [navigate]);
 
     // Toggle cart visibility
-    const [isCartVisible, setCartVisible] = useState(false);
-    const toggleCart = () => {
-        setCartVisible(!isCartVisible);
-    };
+    const toggleCart = () => setCartVisible(!isCartVisible);
 
-
-    // Modals visibility state
-    const [isLoginModalVisible, setLoginModalVisible] = useState(false);
-    const toggleLoginModal = () => {
-        setLoginModalVisible(!isLoginModalVisible);
-    };
-
-    // for login modal 
-    const [isSignModalVisible, setSignModalVisible] = useState(false);
-    const toggleSignupModal = () => {
-        setSignModalVisible(!isSignModalVisible)
-    }
-
-    // for forgot password modal 
-    const [isForgotVisible, setForgot] = useState(false);
-    const toggloForgotModal = () => {
-        setForgot(!isForgotVisible)
-    }
+    // Toggle modal visibility functions
+    const toggleLoginModal = () => setLoginModalVisible(!isLoginModalVisible);
+    const toggleSignupModal = () => setSignModalVisible(!isSignModalVisible);
+    const toggloForgotModal = () => setForgot(!isForgotVisible);
 
     // Disable body scroll when modals are visible
     useEffect(() => {
-        if (isLoginModalVisible || isSignModalVisible || isForgotVisible) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'auto';
-        }
+        document.body.style.overflow = isLoginModalVisible || isSignModalVisible || isForgotVisible ? 'hidden' : 'auto';
         return () => {
             document.body.style.overflow = 'auto';
         };
-    }, [isLoginModalVisible || isSignModalVisible || isForgotVisible]);
+    }, [isLoginModalVisible, isSignModalVisible, isForgotVisible]);
 
-    // Handle logout by removing token and updating the state
-    const handleUserLogout = async () => {
-        await logoutUser()
-        toast.success("Logged out successfully");
-        checkUserAuth();
-        navigate("/");
-    };
-
-    // Handle admin logout
-    const handleAdminLogout = async () => {
+    // Handle logout
+    const handleLogout = async (logoutFunc, successMessage, redirectUrl) => {
         try {
-            const response = await logoutAdmin();
-            checkAdminAuth();
-            toast.success(response.message);
-            navigate("/adminLogin");
-        } catch (error) {
+            await logoutFunc();
+            toast.success(successMessage);
+            setTimeout(() => {
+                checkAuth(); // Ensure auth check is done before navigating
+                navigate(redirectUrl); // Then navigate
+            }, 500);
+        } catch (err) {
             toast.error("Logout failed. Please try again.");
-            console.error("Logout error:", error);
+            console.error("Logout error:", err);
         }
     };
-
-    // Handle login success
-    const handleLoginSuccess = () => (setIsLoggedIn(true));
 
     return (
         <>
@@ -122,14 +85,14 @@ const Navbar = ({ admin }) => {
                 admin={admin}
                 onCartToggle={toggleCart}
                 onLoginToggle={toggleLoginModal}
-                isLoggedIn={isLoggedIn}  // Pass logged-in state to NavbarModal
-                onUserLogout={handleUserLogout}  // Pass logout handler to NavbarModal
+                isLoggedIn={isLoggedIn}
+                onUserLogout={() => handleLogout(logoutUser, "Logged out successfully", "/")}
                 isAdminLogedIn={isAdminLogedIn}
-                onAdminLogout={handleAdminLogout}
+                onAdminLogout={() => handleLogout(logoutAdmin, "Logged out successfully", "/adminLogin")}
             />
             <Cartmodal isVisible={isCartVisible} onClose={() => setCartVisible(false)} />
             <LoginModal
-                onLoginSuccess={handleLoginSuccess}
+                onLoginSuccess={() => setIsLoggedIn(true)}
                 isVisible={isLoginModalVisible}
                 onClose={toggleLoginModal}
                 onSignToggle={toggleSignupModal}
@@ -139,21 +102,10 @@ const Navbar = ({ admin }) => {
                 isVisible={isSignModalVisible}
                 onClose={toggleSignupModal}
                 onLoginToggle={toggleLoginModal}
-                onLoginSuccess={handleLoginSuccess}
-
+                onLoginSuccess={() => setIsLoggedIn(true)}
             />
             <ForgotModal isVisible={isForgotVisible} onClose={toggloForgotModal} />
-            <ToastContainer
-                position="top-center" // Position to top-center
-                autoClose={3000} // Close after 3 seconds
-                hideProgressBar={false} // Show progress bar
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-            />
+
         </>
     );
 };

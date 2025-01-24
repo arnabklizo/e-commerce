@@ -31,6 +31,9 @@ import NewProduct from './routs/admin/newProduct/NewProduct.jsx';
 import PreviewProduct from './routs/admin/previewProduct/PreviewProduct.jsx';
 import AdminLogin from './routs/admin/login/AdminLogin.jsx';
 import UpdateProduct from './routs/admin/addProduct/UpdateProduct.jsx';
+import { ToastContainer } from "react-toastify";
+
+
 // import Alert from './components/Alert';
 // import TextForms from './components/TextForms';
 // import Foot from './components/Foot';
@@ -43,6 +46,18 @@ function App() {
 
   return (
     <>
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+
       <Router>
         <Routes>
           <Route

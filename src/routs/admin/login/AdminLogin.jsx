@@ -6,7 +6,7 @@ import { Icon } from '../../../constans/icon.js';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEyeSlash, faEye } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from 'react-router-dom';
-import Cookies from 'js-cookie'; // Import js-cookie
+import { isAdmin } from '../../../services/api';
 import './AdminLogin.css';
 
 const AdminLogin = () => {
@@ -17,17 +17,25 @@ const AdminLogin = () => {
 
     const navigate = useNavigate();
 
-    useEffect(() => {
-        // Redirect to dashboard if already logged in
-        const token = Cookies.get("adminToken");
-        if (token) {
-            navigate("/dashboard");
+
+    const checkAuth = async () => {
+        try {
+            const adminResponse = await isAdmin();
+            if (adminResponse.data.isAuthenticated) {
+
+                navigate("/dashboard");
+            }
+        } catch (err) {
+            navigate("/adminLogin");
         }
+    };
+
+    useEffect(() => {
+        checkAuth();
     }, [navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         // Validate inputs
         if (!email || !password) {
             toast.error("Both fields are required", { position: "top-center" });
@@ -56,7 +64,6 @@ const AdminLogin = () => {
             setLoading(false);
         }
     };
-
 
     // Toggle password visibility
     const togglePasswordVisibility = () => setShowPassword(prev => !prev);

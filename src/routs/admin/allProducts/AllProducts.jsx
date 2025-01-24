@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Cookies from 'js-cookie';
+import { isAdmin } from '../../../services/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ConfirmationModal from '../../../modals/confirmationMOdal/ConfirmationModal';
 import {
     faCirclePlus,
     faFilter,
-    faMagnifyingGlass,
     faPencil,
     faTrashCan,
     faEye,
@@ -19,7 +18,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { Tooltip } from "bootstrap";
 import { toast } from 'react-toastify';
-import Loader from '../../../components/loader/Loader';
+import Loader from '../../../components/loader/loader';
 import TimeNow from '../../../components/timer/TimeNow';
 import { getAllProducts, delProduct, getCategories } from '../../../services/api';
 import 'react-toastify/dist/ReactToastify.css';
@@ -42,7 +41,13 @@ const AllProducts = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (!Cookies.get('adminToken')) navigate("/adminLogin");
+        const checkAuth = async () => {
+            const adminResponse = await isAdmin();
+            if (!adminResponse.data.isAuthenticated) {
+                navigate("/adminLogin");
+            }
+        };
+        checkAuth();
     }, [navigate]);
 
     useEffect(() => {
