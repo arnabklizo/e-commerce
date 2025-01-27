@@ -4,14 +4,15 @@ import Bestseller from '../../../components/sliders/bestSeller/Bestseller'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useParams } from 'react-router-dom';
 import { faCircleDot, faCartPlus, faHeart, faStar, faLeftLong } from '@fortawesome/free-solid-svg-icons';
-import { product } from '../../../constans/product';
-import { getProduct } from '../../../services/api';
+import { isUser, getProduct, getReviews } from '../../../services/api';
 import './product.css';
 import Loader from '../../../components/loader/Loader';
 import parse from 'html-react-parser';
 
 
 const ProductDetails = () => {
+    const [users, setUsers] = useState(false);
+    const [reviews, setReviews] = useState([]);
     const [productItem, setProductItem] = useState('')
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
@@ -35,8 +36,47 @@ const ProductDetails = () => {
             setLoading(false);
         }
     };
+
+    //fetch Reviews
+    const fetchReviews = async () => {
+        try {
+            const response = await getReviews(id);
+            setReviews(response.data);
+        } catch (error) {
+            console.error("Error fetching reviews:", error.response?.data?.message || error.message);
+        }
+    };
+
+    // suerCheck 
+    const userCheck = async () => {
+        try {
+            const response = await isUser();
+            setUsers(response.data);
+        } catch (error) {
+            console.error("Error occurred:", error.message);
+        }
+    }
+
     // Fetch products from the backend
-    useEffect(() => { fetchProduct(); }, []);
+    useEffect(() => { fetchProduct(); fetchReviews(); userCheck() }, []);
+
+
+
+
+    // back 
+
+
+    const FormatDate = (date) => {
+        const inputDate = new Date(date); // or use the input dynamically from props/state
+
+        const formattedDate = inputDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        });
+
+        return { formattedDate };
+    }
 
     const renderPrice = (product) => {
         return product.discountPrice > 0 ? (
@@ -134,110 +174,52 @@ const ProductDetails = () => {
                                     {/* <!-- review box  --> */}
 
                                     <div className="reviewBox my-2 mt-4">
-                                        <div className="leaveRev border rounded p-2">
-                                            <div className="text-dark fw-bold fs-5 text-center mb-3">Leave a review for this product
-                                            </div>
-                                            <form action="">
-                                                <div className="form-floating mb-2">
-                                                    <textarea className="form-control revInp" placeholder="Leave a comment here"
-                                                        id="reviewBoxInp"></textarea>
-                                                    <label htmlFor="reviewBoxInp">Comments</label>
+
+                                        {users.isAuthenticated ? (
+                                            <div className="leaveRev border rounded p-2">
+                                                <div className="text-dark fw-bold fs-5 text-center mb-3">Leave a review for this product
                                                 </div>
-                                                <div className="ratingBox d-flex align-items-center fw-bold text-dark">
-                                                    <span className="rt">Rate Us :</span>
-                                                    <div className="ratingStars ms-2">
-                                                        <input value="5" name="value-radio" id="value-1" type="radio"
-                                                            className="star s1" />
-                                                        <input value="4" name="value-radio" id="value-2" type="radio"
-                                                            className="star s2" />
-                                                        <input value="3" name="value-radio" id="value-3" type="radio"
-                                                            className="star s3" />
-                                                        <input value="2" name="value-radio" id="value-4" type="radio"
-                                                            className="star s4" />
-                                                        <input value="1" name="value-radio" id="value-5" type="radio"
-                                                            className="star s5" />
+                                                <form action="">
+                                                    <div className="form-floating mb-2">
+                                                        <textarea className="form-control revInp" placeholder="Leave a comment here"
+                                                            id="reviewBoxInp"></textarea>
+                                                        <label htmlFor="reviewBoxInp">Comments</label>
+                                                    </div>
+                                                    <div className="ratingBox d-flex align-items-center fw-bold text-dark">
+                                                        <span className="rt">Rate Us :</span>
+                                                        <div className="ratingStars ms-2">
+                                                            {[5, 4, 3, 2, 1].map((rating) => (
+                                                                <input value={rating} name="value-radio" id={`value-${rating}`} key={rating} type="radio"
+                                                                    className={`star s${rating}`} />
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                    <button className="btn btn-dark roboto">Submit review</button>
+                                                </form>
+                                            </div>
+                                        ) : <></>}
+
+                                        <div className="shwoRev mt-3">
+                                            {reviews.map((review) => (
+                                                <div className="reviewBox my-2 border rounded p-3 " key={review._id}>
+                                                    {/* <div className="reviewer fw-bold text-dark fs-4">
+                                                        Apple Orange
+                                                    </div> */}
+                                                    <div className="reviewTime">
+                                                        {FormatDate(review.createdAt).formattedDate}
+                                                    </div>
+                                                    <div className="reviewStars mt-2">
+                                                        {(Array.from({ length: review.rating }, (_, index) => index)).map((rating) => (
+                                                            <FontAwesomeIcon icon={faStar} className='me-2' key={rating} />
+                                                        ))}
+                                                    </div>
+
+                                                    <p className="reviewText text-dark">{review.review}</p>
+                                                    <div className="text-end">
+                                                        &mdash; {review.userId.firstName || "Anonymous"}
                                                     </div>
                                                 </div>
-                                                <button className="btn btn-dark roboto">Submit review</button>
-                                            </form>
-                                        </div>
-                                        <div className="shwoRev mt-3">
-                                            <div className="reviewBox my-2 border rounded p-3 ">
-                                                <div className="reviewer fw-bold text-dark fs-4">
-                                                    Apple Orange
-                                                </div>
-                                                <div className="reviewTime">
-                                                    January 19, 2024
-                                                </div>
-                                                <div className="reviewStars mt-2">
-                                                    <FontAwesomeIcon icon={faStar} className='me-2' />
-                                                    <FontAwesomeIcon icon={faStar} className='me-2' />
-                                                    <FontAwesomeIcon icon={faStar} className='me-2' />
-                                                    <FontAwesomeIcon icon={faStar} className='me-2' />
-                                                </div>
-                                                <p className="reviewText">
-                                                    Lorem ipsum dolor, sit amet consectetur adipisicing elit. Corporis officia
-                                                    asperiores maxime soluta numquam enim nihil! Ullam tempore similique illum earum
-                                                    totam, a omnis illo doloribus blanditiis distinctio aut qui.
-                                                </p>
-                                            </div>
-                                            <div className="reviewBox my-2 border rounded p-3 ">
-                                                <div className="reviewer fw-bold text-dark fs-4">
-                                                    Apple Orange
-                                                </div>
-                                                <div className="reviewTime">
-                                                    January 19, 2024
-                                                </div>
-                                                <div className="reviewStars mt-2">
-                                                    <FontAwesomeIcon icon={faStar} className='me-2' />
-                                                    <FontAwesomeIcon icon={faStar} className='me-2' />
-                                                </div>
-                                                <p className="reviewText">
-                                                    Lorem ipsum dolor, sit amet consectetur adipisicing elit. Corporis officia
-                                                    asperiores maxime soluta numquam enim nihil! Ullam tempore similique illum earum
-                                                    totam, a omnis illo doloribus blanditiis distinctio aut qui.
-                                                </p>
-                                            </div>
-                                            <div className="reviewBox my-2 border rounded p-3 ">
-                                                <div className="reviewer fw-bold text-dark fs-4">
-                                                    Apple Orange
-                                                </div>
-                                                <div className="reviewTime">
-                                                    January 19, 2024
-                                                </div>
-                                                <div className="reviewStars mt-2">
-                                                    <FontAwesomeIcon icon={faStar} className='me-2' />
-                                                    <FontAwesomeIcon icon={faStar} className='me-2' />
-                                                    <FontAwesomeIcon icon={faStar} className='me-2' />
-                                                    <FontAwesomeIcon icon={faStar} className='me-2' />
-                                                    <FontAwesomeIcon icon={faStar} className='me-2' />
-                                                </div>
-                                                <p className="reviewText">
-                                                    Lorem ipsum dolor, sit amet consectetur adipisicing elit. Corporis officia
-                                                    asperiores maxime soluta numquam enim nihil! Ullam tempore similique illum earum
-                                                    totam, a omnis illo doloribus blanditiis distinctio aut qui.
-                                                </p>
-                                            </div>
-                                            <div className="reviewBox my-2 border rounded p-3 ">
-                                                <div className="reviewer fw-bold text-dark fs-4">
-                                                    Apple Orange
-                                                </div>
-                                                <div className="reviewTime">
-                                                    January 19, 2024
-                                                </div>
-                                                <div className="reviewStars mt-2">
-                                                    <FontAwesomeIcon icon={faStar} className='me-2' />
-                                                    <FontAwesomeIcon icon={faStar} className='me-2' />
-                                                    <FontAwesomeIcon icon={faStar} className='me-2' />
-
-                                                </div>
-                                                <p className="reviewText">
-                                                    Lorem ipsum dolor, sit amet consectetur adipisicing elit. Corporis officia
-                                                    asperiores maxime soluta numquam enim nihil! Ullam tempore similique illum earum
-                                                    totam, a omnis illo doloribus blanditiis distinctio aut qui.
-                                                </p>
-                                            </div>
-
+                                            ))}
                                         </div>
                                     </div>
                                 </div>

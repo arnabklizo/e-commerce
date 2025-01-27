@@ -29,7 +29,12 @@ export const isUser = () => API.get("/auth/isAuthenticated");
 
 // user profile update
 export const checkMe = () => API.get("/user/me");
-export const updateUser = (id, data) => API.put(`/user/update/${id}`, data);
+export const updateUser = (id, updatedProfile, profilePicture, deleteAddresses) => API.put(`/user/update/${id}`, {
+    profile: updatedProfile,
+    profilePicture,
+    deleteAddresses,
+}, { headers: { "Content-Type": "multipart/form-data" } });
+// export const updateUser = (id, formData) => API.put(`/user/update/${id}`, formData, { headers: { "Content-Type": "multipart/form-data" } });
 
 // Admin Authentication
 export const loginAdmin = (data) => API.post("/admin/login", data); // Login admin (requires email and password)
@@ -65,6 +70,13 @@ export const getAllProducts = (page, limit, sortField, sortOrder, category, sear
 export const delProduct = (id) => API.delete(`/products/${id}`);
 export const getProduct = (id) => API.get(`/products/${id}`);
 export const updateProduct = (id, formData) => API.put(`/products/${id}`, formData, { headers: { 'Content-Type': 'multipart/form-data' }, });
+
+
+//for reviews
+export const addReview = (data) => API.post("/reviews", data);
+export const getReviews = (productId) => API.get(`/reviews/${productId}`);
+export const updateReview = (id, data) => API.put(`/reviews/${id}`, data);
+export const deleteReview = (id) => API.delete(`/reviews/${id}`);
 
 
 //get productsByCategory

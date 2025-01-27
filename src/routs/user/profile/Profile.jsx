@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { isUser, checkMe, updateUser } from '../../../services/api';
+import { isUser, checkMe, updateUser, getReviews, updateReview, deleteReview } from '../../../services/api';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { product } from '../../../constans/product';
+// const { format } = require('date-fns');
+// const { utcToZonedTime } = require('date-fns-tz');
 import { faUserPen, faPlus, faPencil, faTrash, faLeftLong, faStar, faUnlockKeyhole } from "@fortawesome/free-solid-svg-icons";
 import ReviewModal from '../../../modals/reviewModal/ReviewModal';
 import { toast } from 'react-toastify';
 import './profile.css';
+import { Icon } from '../../../constans/icon';
 
 const Profile = () => {
     const [profile, setProfile] = useState({
@@ -16,11 +18,14 @@ const Profile = () => {
         email: "",
         addresses: [],
     });
+    const [createDate, setCreatedDate] = useState('');
+    const [deleteAddresses, setDeleteAddresses] = useState([]); // Array of address IDs to delete
     const [isBtnVisible, setBtnVisible] = useState(false); // Button visibility state
-    const [profilePicture, setProfilePicture] = useState(product.hoodie); // Default picture
+    const [profilePicture, setProfilePicture] = useState(null); // Default picture
     const [previewImage, setPreviewImage] = useState(null); // State for image preview
     const [isReviewVisible, setReviewVisible] = useState(false);
     const [selectedReview, setSelectedReview] = useState(null);
+    const [review, setReview] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -33,7 +38,14 @@ const Profile = () => {
                     return;
                 }
                 const userResponse = await checkMe();
+                timeStamps(userResponse.data.createdAt);
                 setProfile(userResponse.data);
+                if (userResponse.data.imageUrl) {
+                    setProfilePicture(userResponse.data.imageUrl);
+                } else {
+                    setProfilePicture(Icon.user);
+                }
+
             } catch (error) {
                 console.error("Error fetching user data:", error);
             }
@@ -55,7 +67,9 @@ const Profile = () => {
                 ...address,
             }));
 
-            await updateUser(profile._id, updatedProfile, profilePicture);
+            await updateUser(profile._id, updatedProfile, profilePicture, deleteAddresses);
+            console.log('previewImage', previewImage)
+            // await updateUser(profile._id, updatedProfile);
             setBtnVisible(false); // Hide the button after successful save
             toast.success('Profile updated successfully');
         } catch (error) {
@@ -64,8 +78,30 @@ const Profile = () => {
         }
     };
 
-    //delete address
-    const deleteAddress = (index) => {
+    const timeStamps = (date) => {
+        const dates = new Date(date);
+
+        // Get the formatted date using toLocaleDateString
+        const formattedDatePart = dates.toLocaleDateString('en-US', {
+            month: 'short',
+            day: '2-digit',
+            year: 'numeric',
+        });
+
+        // Get the formatted time using toLocaleTimeString (24-hour format)
+        const formattedTimePart = dates.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false, // 24-hour time format
+        });
+
+        // Combine the formatted date and time
+        const result = `${formattedDatePart}, ${formattedTimePart}`;
+        setCreatedDate(result);
+    };
+
+    const deleteAddress = (index, id) => {
+        setDeleteAddresses((prev) => [...prev, id]);
         setProfile((prev) => {
             const updatedAddresses = prev.addresses.filter((_, i) => i !== index);
             return { ...prev, addresses: updatedAddresses };
@@ -107,6 +143,25 @@ const Profile = () => {
         setBtnVisible(true); // Show the button for new addresses
     };
 
+
+    const fetchReviews = async () => {
+        try {
+            const response = await getReviews(productId);
+            setReview(response.data);
+        } catch (error) {
+            console.error("Error fetching reviews:", error.response?.data?.message || error.message);
+        }
+    };
+
+    const handleDelete = async (id) => {
+        try {
+            await deleteReview(id);
+            fetchReviews(); // Refresh the reviews list
+        } catch (error) {
+            console.error("Error deleting review:", error.response?.data?.message || error.message);
+        }
+    };
+
     //back 
     useEffect(() => {
         if (isReviewVisible) {
@@ -122,10 +177,13 @@ const Profile = () => {
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            setPreviewImage(URL.createObjectURL(file)); // Create preview URL
-            setBtnVisible(true); // Show "Save" button when a file is selected
+            setPreviewImage(URL.createObjectURL(file)); // Create a local preview
+            setProfilePicture(file); // Store the actual file for submission
+            setBtnVisible(true); // Enable the save button
         }
     };
+
+
     const reviews = [
         {
             id: 1,
@@ -158,6 +216,7 @@ const Profile = () => {
         setSelectedReview(review);
         setReviewVisible(true);
     };
+
     const closeModal = () => {
         setSelectedReview(null);
         setReviewVisible(false);
@@ -200,10 +259,10 @@ const Profile = () => {
                                         </div>
                                         <div className="ms-3">
                                             <div className="profname roboto fw-bold text-dark fs-3">
-                                                Zerom Dotsure
+                                                {profile.firstName ? profile.firstName : `User`} {profile.lastName}
                                             </div>
                                             <div className="registeredDate fw-bold text-dark">
-                                                Registered : <span>Aug 17, 2024</span>
+                                                Registration Date : <span>{createDate}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -247,34 +306,62 @@ const Profile = () => {
                                             />
                                         </div>
                                         <hr />
-                                        {profile.addresses.map((address, index) => (
-                                            <div className="addressField" key={index}>
-                                                <div className='d-flex justify-content-between align-items-center'>
-                                                    <div className="text-dark">Address {index + 1}</div>
-                                                    <button
-                                                        type="button"
-                                                        className="btn ms-2"
-                                                        onClick={() => deleteAddress(index)}
-                                                        title="Delete Address"
+                                        <div className="accordion" id="accAddress">
+                                            {profile.addresses.map((address, index) => (
+                                                <div className="accordion-item" key={index}>
+                                                    {
+                                                        <h2 className="accordion-header">
+                                                            <button
+                                                                className="accordion-button collapsed p-2"
+                                                                type="button"
+                                                                data-bs-toggle="collapse"
+                                                                data-bs-target={`#collapse${index}`}
+                                                                aria-expanded="false"
+                                                                aria-controls={`collapse${index}`}
+                                                            >
+                                                                Address {index + 1}
+                                                            </button>
+                                                        </h2>
+                                                    }
+                                                    <div
+                                                        id={`collapse${index}`}
+                                                        className="accordion-collapse collapse"
+                                                        data-bs-parent="#accAddress"
                                                     >
-                                                        <FontAwesomeIcon icon={faTrash} />
-                                                    </button>
-                                                </div>
-                                                {['addressLine1', 'street', 'city', 'state', 'country', 'zip'].map((field) => (
-                                                    <div key={field} className="input-group my-1">
-                                                        <span className="input-group-text">{field.replace(/([A-Z])/g, ' $1')}</span>
-                                                        <input
-                                                            type="text"
-                                                            className="form-control"
-                                                            value={address[field] || ""}
-                                                            onChange={(e) => handleAddressChange(index, field, e.target.value)}
-                                                        />
+                                                        <div className="accordion-body">
+                                                            <div className="addressField">
+                                                                {['addressLine1', 'street', 'city', 'state', 'country', 'zip'].map((field) => (
+                                                                    <div key={field} className="input-group my-1">
+                                                                        <span className="input-group-text">{field.replace(/([A-Z])/g, ' $1')}</span>
+                                                                        <input
+                                                                            type="text"
+                                                                            className="form-control"
+                                                                            value={address[field] || ""}
+                                                                            onChange={(e) => handleAddressChange(index, field, e.target.value)}
+                                                                        />
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                            {
+                                                                <div className="d-flex align-items-center">
+                                                                    <label htmlFor={`deleteAddress${index}`} className='ms-auto'>Delete Address {index + 1}</label>
+                                                                    <button
+                                                                        id={`deleteAddress${index}`}
+                                                                        type="button"
+                                                                        className="btn"
+                                                                        onClick={() => deleteAddress(index, address._id)}
+                                                                        title="Delete Address"
+                                                                    >
+                                                                        <FontAwesomeIcon icon={faTrash} />
+                                                                    </button>
+                                                                </div>
+                                                            }
+                                                        </div>
                                                     </div>
-                                                ))}
-
-                                            </div>
-                                        ))}
-                                        <button type="button" onClick={addAddress} className="btn btn-dark whiteIcon my-1">
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <button type="button" onClick={addAddress} className="btn btn-dark whiteIcon my-2">
                                             <FontAwesomeIcon icon={faPlus} className='me-1' />
                                             Add Address
                                         </button>

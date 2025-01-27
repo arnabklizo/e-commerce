@@ -99,7 +99,7 @@ const ShowProducts = () => {
                                 <option value="" defaultValue>
                                     All products
                                 </option>
-                                {console.log(filter)}
+                                {/* {console.log(filter)} */}
                                 {filter.map((selector) => (
                                     <option value={selector}>{selector.toUpperCase()}</option>
                                 ))}
