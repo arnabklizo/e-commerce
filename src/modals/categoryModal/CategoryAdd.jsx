@@ -62,8 +62,8 @@ const CategoryAdd = ({ isVisible, onClose }) => {
         // console.log(categoryImage)
         try {
             setLoading(true);
-            const response = await addCategory(formData)
-            toast.success("Category uploaded successfully!");
+            const { data } = await addCategory(formData)
+            toast.success(data.message);
             setCategoryName("");
             setCategoryImage(null);
             onClose();

@@ -16,15 +16,7 @@ const LoginModal = ({ isVisible, onClose, onSignToggle, onForgotToggle, onLoginS
         e.preventDefault();
         try {
             const response = await loginUser({ email, password });
-            // console.log('this is data', response);
             toast.success(response.data.message);
-
-            // if (response?.token) {
-            //     console.log(hi)
-            // } else {
-            //     toast.error("Token missing in server response.");
-            // }
-
             onLoginSuccess();
             onClose();
         } catch (error) {

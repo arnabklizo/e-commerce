@@ -5,7 +5,7 @@ import { isAdmin } from '../../../services/api';
 import TimeNow from '../../../components/timer/TimeNow';
 import CategoryAdd from '../../../modals/categoryModal/CategoryAdd';
 import UpdateCategory from '../../../modals/updateCategory/UpdateCategory';
-import ConfirmationModal from '../../../modals/confirmationMOdal/ConfirmationModal';
+import ConfirmationModal from '../../../modals/confirmationModal/ConfirmationModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faCirclePlus,
@@ -22,7 +22,7 @@ import { getCategories, delCategory, updateCategory } from '../../../services/ap
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../categoryList/category.css';
-import Loader from '../../../components/loader/loader';
+import Loader from '../../../components/loader/Loader';
 
 const CategoryList = () => {
     const [categoryId, setCategoryId] = useState('')
@@ -84,7 +84,7 @@ const CategoryList = () => {
             setCategories((prevCategories) =>
                 prevCategories.map((cat) => (cat._id === updatedCategory._id ? response.data.category : cat))
             );
-            toast.success('Category updated successfully!');
+            toast.success(response.data.message);
             closeEditModal();
         } catch (error) {
             console.error('Error updating category:', error);
@@ -103,9 +103,9 @@ const CategoryList = () => {
         setConfirmModalVisible(false);
         setLoading(true);
         try {
-            await delCategory(categoryId);
+            const { data } = await delCategory(categoryId);
             setCategories(categories.filter((category) => category._id !== categoryId));
-            toast.success('Category deleted successfully!');
+            toast.success(data.message);
             fetchCategories(1);
         } catch (error) {
             console.error('Failed to delete category:', error);

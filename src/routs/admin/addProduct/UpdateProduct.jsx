@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import ReactQuill from 'react-quill';
 import { Tooltip } from 'bootstrap';
 import { useNavigate, useParams } from 'react-router-dom';
-import Loader from '../../../components/loader/loader';
+import Loader from '../../../components/loader/Loader';
 import { isAdmin } from '../../../services/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashCan, faLeftLong } from '@fortawesome/free-solid-svg-icons';
@@ -94,25 +94,14 @@ const UpdateProduct = () => {
                     form.append(key, JSON.stringify(value));
                 }
             } else {
-                // Append non-array values directly
                 form.append(key, value);
             }
         });
 
-        // Debug: Log the FormData keys and values
-        // for (let [key, value] of form.entries()) {
-        //     console.log(`FormData key: ${key}, value:`, value);
-        // }
-
         try {
             setLoading(true);
-            // console.log('Sending FormData:');
-            // for (let [key, value] of form.entries()) {
-            //     console.log(`FormData key: ${key}, value:`, value);
-            // }
-
-            await updateProduct(id, form); // Pass FormData to API
-            toast.success('Product updated successfully!');
+            const { data } = await updateProduct(id, form); // Pass FormData to API
+            toast.success(data.message);
             navigate('/allProducts');
         } catch (error) {
             console.error('Error updating product:', error.response?.data || error.message);

@@ -1,6 +1,10 @@
 import React, { useEffect } from 'react';
 import './confirmationModal.css';
 import { Tooltip } from 'bootstrap';
+import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
+
 
 const ConfirmationModal = ({ isVisible, onClose, onConfirm, message, categoryId }) => {
     useEffect(() => {
@@ -39,6 +43,9 @@ const ConfirmationModal = ({ isVisible, onClose, onConfirm, message, categoryId 
                         ></button>
                     </div>
                     <div className="modal-body position-relative">
+                        <div className="text-center text-danger dangerIcon">
+                            <FontAwesomeIcon icon={faTriangleExclamation} className='mx-auto fs-1' />
+                        </div>
                         <h5 className="text-center py-3">Are you sure you want to delete this {message}. !</h5>
                         <div className="text-center">
                             <button className="btn btn-outline-dark m-2" onClick={onClose}>No, Cancel</button>

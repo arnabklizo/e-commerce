@@ -53,7 +53,7 @@ export const getCategories = (page, limit, sortField, sortOrder, searchQuery) =>
     },
 });
 export const delCategory = (id) => API.delete(`/admin/categories/${id}`);
-export const updateCategory = (data) => API.put(`/admin/categories/${data._id}`, data);
+export const updateCategory = (data) => API.put(`/admin/categories/${data._id}`, data, { headers: { 'Content-Type': 'multipart/form-data' }, });
 
 //for product
 export const addProduct = (data) => API.post("/products/addProduct", data, { headers: { "Content-Type": "multipart/form-data" } });
@@ -77,6 +77,7 @@ export const addReview = (data) => API.post("/reviews", data);
 export const getReviews = (productId) => API.get(`/reviews/${productId}`);
 export const updateReview = (id, data) => API.put(`/reviews/${id}`, data);
 export const deleteReview = (id) => API.delete(`/reviews/${id}`);
+export const getReviewsByUser = (userId) => API.get(`/reviews/user/${userId}`);
 
 
 //get productsByCategory

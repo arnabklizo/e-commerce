@@ -65,14 +65,13 @@ const Navbar = ({ admin }) => {
     }, [isLoginModalVisible, isSignModalVisible, isForgotVisible]);
 
     // Handle logout
-    const handleLogout = async (logoutFunc, successMessage, redirectUrl) => {
+    const handleLogout = async (logoutFunc, redirectUrl) => {
         try {
-            await logoutFunc();
-            toast.success(successMessage);
-            setTimeout(() => {
-                checkAuth(); // Ensure auth check is done before navigating
-                navigate(redirectUrl); // Then navigate
-            }, 500);
+            const response = await logoutFunc();
+
+            toast.success(response.data.message);
+            checkAuth();
+            navigate(redirectUrl);
         } catch (err) {
             toast.error("Logout failed. Please try again.");
             console.error("Logout error:", err);
@@ -86,9 +85,9 @@ const Navbar = ({ admin }) => {
                 onCartToggle={toggleCart}
                 onLoginToggle={toggleLoginModal}
                 isLoggedIn={isLoggedIn}
-                onUserLogout={() => handleLogout(logoutUser, "Logged out successfully", "/")}
+                onUserLogout={() => handleLogout(logoutUser, "/")}
                 isAdminLogedIn={isAdminLogedIn}
-                onAdminLogout={() => handleLogout(logoutAdmin, "Logged out successfully", "/adminLogin")}
+                onAdminLogout={() => handleLogout(logoutAdmin, "/adminLogin")}
             />
             <Cartmodal isVisible={isCartVisible} onClose={() => setCartVisible(false)} />
             <LoginModal

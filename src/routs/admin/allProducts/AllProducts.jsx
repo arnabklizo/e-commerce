@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { isAdmin } from '../../../services/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import ConfirmationModal from '../../../modals/confirmationMOdal/ConfirmationModal';
+import ConfirmationModal from '../../../modals/confirmationModal/ConfirmationModal';
 import {
     faCirclePlus,
     faFilter,
@@ -18,7 +18,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { Tooltip } from "bootstrap";
 import { toast } from 'react-toastify';
-import Loader from '../../../components/loader/loader';
+import Loader from '../../../components/loader/Loader';
 import TimeNow from '../../../components/timer/TimeNow';
 import { getAllProducts, delProduct, getCategories } from '../../../services/api';
 import 'react-toastify/dist/ReactToastify.css';
@@ -26,7 +26,7 @@ import '../allProducts/AllProducts.css';
 
 const AllProducts = () => {
     const [productId, setProductId] = useState('')
-    const [isConfirmModalVisible, setConfirmModalVisible] = useState(false)
+    const [isConfirmModalVisible, setConfirmModalVisible] = useState(false);
     const [searchQuery, setSearchQuery] = useState('')
     const [loading, setLoading] = useState(true);
     const [products, setProducts] = useState([]);
@@ -97,9 +97,9 @@ const AllProducts = () => {
         setConfirmModalVisible(false);
         setLoading(true);
         try {
-            await delProduct(productId);
+            const { data } = await delProduct(productId);
             setProducts(prev => prev.filter(product => product._id !== productId));
-            toast.success('Product deleted successfully !!');
+            toast.success(data.message);
             fetchProducts(1, 5, selectedCategory);
         } catch (error) {
             toast.error('Error deleting category. Please try again.');

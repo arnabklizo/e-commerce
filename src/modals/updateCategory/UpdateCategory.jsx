@@ -41,37 +41,38 @@ const UpdateCategory = ({ isVisible, onClose, category, onSave }) => {
         setLoading(true);
 
         try {
-            let uploadedImageUrl = imageUrl;
+            // let uploadedImageUrl = imageUrl;
 
             // If a new image file is selected, upload it to Cloudinary
-            if (file) {
-                const formData = new FormData();
-                formData.append('file', file);
-                formData.append('upload_preset', 'ml_default'); // Update to your Cloudinary preset
+            // if (file) {
+            //     const formData = new FormData();
+            //     formData.append('file', file);
+            //     formData.append('upload_preset', 'ml_default'); // Update to your Cloudinary preset
 
-                // Upload image to Cloudinary
-                const response = await fetch('https://api.cloudinary.com/v1_1/ddjjlvsdi/image/upload', {
-                    method: 'POST',
-                    body: formData,
-                });
 
-                if (!response.ok) {
-                    console.error('Failed to upload image. Status:', response.status, await response.text());
-                    throw new Error('Failed to upload image to Cloudinary');
-                }
+            //     // Upload image to Cloudinary
+            //     const response = await fetch('https://api.cloudinary.com/v1_1/ddjjlvsdi/image/upload/', {
+            //         method: 'POST',
+            //         body: formData,
+            //     });
 
-                const data = await response.json();
-                // console.log("Cloudinary Response:", data);
-                if (!data.secure_url) {
-                    console.error('Cloudinary response does not contain secure_url:', data)
-                    throw new Error('Image URL not returned by Cloudinary');
-                }
+            //     if (!response.ok) {
+            //         console.error('Failed to upload image. Status:', response.status, await response.text());
+            //         throw new Error('Failed to upload image to Cloudinary');
+            //     }
 
-                uploadedImageUrl = data.secure_url; // Use the new Cloudinary image URL
-            }
+            //     const data = await response.json();
+            //     // console.log("Cloudinary Response:", data);
+            //     if (!data.secure_url) {
+            //         console.error('Cloudinary response does not contain secure_url:', data)
+            //         throw new Error('Image URL not returned by Cloudinary');
+            //     }
+
+            //     uploadedImageUrl = data.secure_url; // Use the new Cloudinary image URL
+            // }
 
             // Pass the updated category details to the parent component
-            onSave({ ...category, name, imageUrl: uploadedImageUrl });
+            onSave({ ...category, name, imageUrl: imageUrl });
             onClose();
         } catch (error) {
             console.error('Error updating category:', error);

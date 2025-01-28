@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import ReactQuill from 'react-quill';
 import { useNavigate } from 'react-router-dom';
 import { Tooltip } from 'bootstrap';
-import Loader from '../../../components/loader/loader';
+import Loader from '../../../components/loader/Loader';
 import Cookies from 'js-cookie';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashCan, faLeftLong } from '@fortawesome/free-solid-svg-icons';
@@ -84,8 +84,8 @@ const NewProduct = () => {
 
         try {
             setLoading(true);
-            await addProduct(form);
-            toast.success("Product added successfully!");
+            const { data } = await addProduct(form);
+            toast.success(data.message);
             navigate("/allProducts");
         } catch (error) {
             console.error("Error submitting product:", error);

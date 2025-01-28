@@ -119,7 +119,7 @@ const NavbarModal = ({
 
             {isLoggedIn ? (
                 <>
-                    <li className="nav-item" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Wishlist">
+                    <li className="nav-item" data-bs-toggle="tooltip" title="Profile" data-bs-placement="bottom" >
                         <Link className="btn btnAcc" to="/profile">
                             <FontAwesomeIcon icon={faUser} />
                         </Link>

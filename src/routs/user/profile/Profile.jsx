@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { isUser, checkMe, updateUser, getReviews, updateReview, deleteReview } from '../../../services/api';
+import { Link } from 'react-router-dom';
+import { isUser, checkMe, updateUser, getReviewsByUser, deleteReview } from '../../../services/api';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// const { format } = require('date-fns');
-// const { utcToZonedTime } = require('date-fns-tz');
-import { faUserPen, faPlus, faPencil, faTrash, faLeftLong, faStar, faUnlockKeyhole } from "@fortawesome/free-solid-svg-icons";
+import ConfirmationModal from '../../../modals/confirmationModal/ConfirmationModal';
+import { faUserPen, faPlus, faPencil, faTrash, faLeftLong, faStar, faUnlockKeyhole, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import ReviewModal from '../../../modals/reviewModal/ReviewModal';
+import Loader from '../../../components/loader/Loader';
 import { toast } from 'react-toastify';
 import './profile.css';
 import { Icon } from '../../../constans/icon';
@@ -23,33 +24,48 @@ const Profile = () => {
     const [isBtnVisible, setBtnVisible] = useState(false); // Button visibility state
     const [profilePicture, setProfilePicture] = useState(null); // Default picture
     const [previewImage, setPreviewImage] = useState(null); // State for image preview
-    const [isReviewVisible, setReviewVisible] = useState(false);
+    const [isReviewVisible, setReviewVisible] = useState(false); // for edit review modal
+    const [isConfirmModalVisible, setConfirmModalVisible] = useState(false); //for confirmation Modal
+    const [confirmationId, setConfirmationId] = useState(''); //for confirmation Modal
+    const [loading, setLoading] = useState(true);
     const [selectedReview, setSelectedReview] = useState(null);
-    const [review, setReview] = useState([]);
+    const [reviews, setReviews] = useState([]);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const adminResponse = await isUser();
-                if (!adminResponse.data.isAuthenticated) {
-                    navigate("/");
-                    toast.error('You are not authorized to view this page');
-                    return;
-                }
-                const userResponse = await checkMe();
-                timeStamps(userResponse.data.createdAt);
-                setProfile(userResponse.data);
-                if (userResponse.data.imageUrl) {
-                    setProfilePicture(userResponse.data.imageUrl);
-                } else {
-                    setProfilePicture(Icon.user);
-                }
 
-            } catch (error) {
-                console.error("Error fetching user data:", error);
+    //fetch data
+    const fetchData = async () => {
+        setLoading(true);
+        try {
+            const userResponse = await checkMe();
+            timeStamps(userResponse.data.createdAt);
+            setProfile(userResponse.data);
+            if (userResponse.data.imageUrl) {
+                setProfilePicture(userResponse.data.imageUrl);
+            } else {
+                setProfilePicture(Icon.user);
             }
-        };
+            const reviewResponse = await getReviewsByUser(userResponse.data._id);
+            setReviews(reviewResponse.data);
+        } catch (error) {
+            console.error("Error fetching user data:", error);
+            console.error("Error fetching reviews:", error.response?.data?.message || error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        const authCheck = async () => {
+            const adminResponse = await isUser();
+            if (!adminResponse.data.isAuthenticated) {
+                navigate("/");
+                toast.error('You are not authorized user.!');
+                return;
+            }
+        }
+
+        authCheck();
         fetchData();
     }, [navigate]);
 
@@ -67,11 +83,11 @@ const Profile = () => {
                 ...address,
             }));
 
-            await updateUser(profile._id, updatedProfile, profilePicture, deleteAddresses);
-            console.log('previewImage', previewImage)
+            const response = await updateUser(profile._id, updatedProfile, profilePicture, deleteAddresses);
+            // console.log('previewImage', previewImage)
             // await updateUser(profile._id, updatedProfile);
             setBtnVisible(false); // Hide the button after successful save
-            toast.success('Profile updated successfully');
+            toast.success(response.data.message);
         } catch (error) {
             console.error("Error updating profile:", error);
             toast.error('Error updating profile');
@@ -144,25 +160,21 @@ const Profile = () => {
     };
 
 
-    const fetchReviews = async () => {
+    //delete review
+    const deleteReviewById = async (id) => {
         try {
-            const response = await getReviews(productId);
-            setReview(response.data);
-        } catch (error) {
-            console.error("Error fetching reviews:", error.response?.data?.message || error.message);
-        }
-    };
-
-    const handleDelete = async (id) => {
-        try {
-            await deleteReview(id);
-            fetchReviews(); // Refresh the reviews list
+            const response = await deleteReview(id);
+            toast.success(response.data.message);
+            fetchData();
+            setConfirmModalVisible(false);
         } catch (error) {
             console.error("Error deleting review:", error.response?.data?.message || error.message);
         }
-    };
+    }
+
 
     //back 
+
     useEffect(() => {
         if (isReviewVisible) {
             document.body.style.overflow = 'hidden';
@@ -174,6 +186,7 @@ const Profile = () => {
         };
     }, [isReviewVisible]);
 
+    // image change handler
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -183,34 +196,19 @@ const Profile = () => {
         }
     };
 
+    const FormatDate = (date) =>
+        new Date(date).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        });
 
-    const reviews = [
-        {
-            id: 1,
-            product: 'Pink T-Shirt for Men',
-            image: 'assets/images/products/product.jpg',
-            rating: 4,
-            comment: 'Great product, very comfortable!',
-            date: 'January 19, 2024',
-        },
-        {
-            id: 2,
-            product: 'Blue Jeans',
-            image: 'assets/images/products/product.jpg',
-            rating: 5,
-            comment: 'Perfect fit and quality.',
-            date: 'February 5, 2024',
-        },
-        {
-            id: 3,
-            product: 'Yellow Hoodie',
-            image: 'assets/images/products/product.jpg',
-            rating: 4,
-            comment: 'Great Product, Perfect fit and quality.',
-            date: 'February 5, 2024',
-        },
-        // Add more reviews here...
-    ];
+    const closeConfirmModal = () => { setConfirmModalVisible(false) }//for confirmation Modal
+
+    const deleteReviews = (id) => { //for confirmation Modal
+        setConfirmModalVisible(true);
+        setConfirmationId(id); // Store the product ID to delete
+    };
 
     const handleEditClick = (review) => {
         setSelectedReview(review);
@@ -220,8 +218,15 @@ const Profile = () => {
     const closeModal = () => {
         setSelectedReview(null);
         setReviewVisible(false);
+        fetchData();
     };
-
+    if (loading) return (
+        <section className="py-5">
+            <div className="h-100 my-5 py-5">
+                <Loader itemName="Loading your profile" admin={false} />
+            </div>
+        </section>
+    )
     return (
         <>
             <section className="profileSection mb-4">
@@ -240,7 +245,6 @@ const Profile = () => {
                                                 alt="Profile"
                                                 className="profilePic border userPicture"
                                             />
-                                            {/* The label is associated with the file input using htmlFor */}
                                             <label
                                                 className="btn btnProfPicEdit position-absolute border-0 rounded cursor-pointer"
                                                 htmlFor="userProfilePicture"
@@ -248,13 +252,12 @@ const Profile = () => {
                                             >
                                                 <FontAwesomeIcon icon={faUserPen} />
                                             </label>
-                                            {/* Ensure the id matches htmlFor */}
                                             <input
                                                 type="file"
                                                 id="userProfilePicture"
-                                                className="d-none" // Hide the input
-                                                accept="image/*" // Allow only image files
-                                                onChange={handleImageChange} // Handle the image selection
+                                                className="d-none"
+                                                accept="image/*"
+                                                onChange={handleImageChange}
                                             />
                                         </div>
                                         <div className="ms-3">
@@ -276,6 +279,7 @@ const Profile = () => {
                                                 className="form-control mb-3"
                                                 value={profile.firstName}
                                                 onChange={(e) => handleInputChange("firstName", e.target.value)}
+                                                placeholder='Enter your first name'
                                             />
                                         </div>
                                         <div className="nameProf">
@@ -285,6 +289,7 @@ const Profile = () => {
                                                 className="form-control mb-3"
                                                 value={profile.lastName}
                                                 onChange={(e) => handleInputChange("lastName", e.target.value)}
+                                                placeholder='Enter your last name'
                                             />
                                         </div>
                                         <div className="nameProf">
@@ -294,6 +299,7 @@ const Profile = () => {
                                                 className="form-control mb-3"
                                                 value={profile.phone}
                                                 onChange={(e) => handleInputChange("phone", e.target.value)}
+                                                placeholder='Enter your phone number'
                                             />
                                         </div>
                                         <div className="nameProf">
@@ -302,7 +308,7 @@ const Profile = () => {
                                                 type="email"
                                                 className="form-control mb-3"
                                                 value={profile.email}
-                                                disabled // Email is not editable
+                                                disabled
                                             />
                                         </div>
                                         <hr />
@@ -338,6 +344,7 @@ const Profile = () => {
                                                                             className="form-control"
                                                                             value={address[field] || ""}
                                                                             onChange={(e) => handleAddressChange(index, field, e.target.value)}
+                                                                            placeholder={`Enter your ${field}`}
                                                                         />
                                                                     </div>
                                                                 ))}
@@ -484,30 +491,35 @@ const Profile = () => {
                                 <div className="profContact profRightBox my-3 p-3">
                                     <h1 className="fs-4 fw-bold text-dark">Reviews</h1>
                                     <div className="revBoxData">
+                                        {reviews.length === 0 && <div className="text-center bg-transparent">No reviews found</div>}
                                         {reviews.map((review) => (
                                             <div className="reviewBox my-2 border rounded p-3 position-relative" key={review.id}>
-                                                <a className="revPrdctDet d-flex pb-2 text-decoration-none" href="#">
-                                                    <div className="prdctImg">
-                                                        <img src={review.image} alt="" className="w-100" />
+                                                <Link className="revPrdctDet d-flex pb-2 text-decoration-none" to={`/product/${review.productId._id}`}>
+                                                    <div className="prdctImg card border">
+                                                        <img src={review.productId.imageUrl[0]} alt="" className="w-100" />
                                                     </div>
-                                                    <div className="prdctName prdctClr fw-bold fs-4 mb-3 ms-3">{review.product}</div>
-                                                </a>
+                                                    <div className="d-flex flex-column ms-3">
+                                                        <div className="prdctName prdctClr fw-bold fs-4">{review.productId.name}</div>
+                                                        <div className="reviewStars mt-2">
+                                                            {[...Array(review.rating)].map((_, i) => (
+                                                                <FontAwesomeIcon icon={faStar} key={i} />
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                </Link>
                                                 <div>
-                                                    <div className="reviewStars mt-2">
-                                                        {[...Array(review.rating)].map((_, i) => (
-                                                            <FontAwesomeIcon icon={faStar} key={i} />
-                                                        ))}
-                                                    </div>
-                                                    <p className="reviewText text-dark">{review.comment}</p>
-                                                    <div className="reviewTime">&mdash; <span>{review.date}</span></div>
+                                                    <p className="reviewText text-dark">{review.review}</p>
+                                                    <div className="reviewTime">&mdash; <span>{FormatDate(review.createdAt)}</span></div>
                                                 </div>
                                                 <button
                                                     className="editRegisteredBtn rounded border position-absolute bottom-0 end-0 text-dark p-2 m-1"
                                                     onClick={() => handleEditClick(review)}
-                                                // onClick={toggleReview}
                                                 >
                                                     <FontAwesomeIcon icon={faPencil} className="me-2" />
                                                     Edit This Review
+                                                </button>
+                                                <button className="btn btn-sm btn-danger whiteIcon position-absolute top-0 end-0" onClick={() => deleteReviews(review._id)}>
+                                                    <FontAwesomeIcon icon={faTrashCan} className="text-danger" />
                                                 </button>
                                             </div>
                                         ))}
@@ -522,6 +534,13 @@ const Profile = () => {
                     isVisible={isReviewVisible}
                     onClose={closeModal}
                     reviewData={selectedReview}
+                />
+                <ConfirmationModal
+                    isVisible={isConfirmModalVisible}
+                    onClose={closeConfirmModal}
+                    message={'Review'}
+                    onConfirm={deleteReviewById}
+                    categoryId={confirmationId}
                 />
             </section>
         </>

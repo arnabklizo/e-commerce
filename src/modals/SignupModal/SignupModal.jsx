@@ -28,7 +28,7 @@ const SignupModal = ({ isVisible, onClose, onLoginToggle, onLoginSuccess }) => {
             const loginResponse = await loginUser({ email, password });
             Cookies.set("token", loginResponse.data.token, { expires: 1 });
             onLoginSuccess();
-            toast.success("Signed up & Logged in successfully!");
+            toast.success(loginResponse.data.message);
         } catch (error) {
             toast.error(error.response?.data?.message || "Registration failed.");
         }

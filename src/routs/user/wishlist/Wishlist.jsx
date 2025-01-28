@@ -5,6 +5,7 @@ import { isUser } from '../../../services/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLeftLong, faCartPlus, faShirt, faHandPointRight } from '@fortawesome/free-solid-svg-icons';
 import { product } from '../../../constans/product';
+import { toast } from 'react-toastify';
 import './wishlist.css'
 
 const Wishlist = () => {
@@ -14,7 +15,7 @@ const Wishlist = () => {
             const adminResponse = await isUser();
             if (!adminResponse.data.isAuthenticated) {
                 navigate("/");
-                toast.error('You are not authorized to view this page');
+                toast.error('You are not authorized user !!');
             }
         };
         checkAuth();

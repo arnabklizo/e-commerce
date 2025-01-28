@@ -17,7 +17,6 @@ const ShowProducts = () => {
     const navigate = useNavigate();
     const { id } = useParams();
 
-    // Redirect if ID is missing
     useEffect(() => {
         if (!id) navigate(-1);
     }, [id, navigate]);
@@ -49,9 +48,6 @@ const ShowProducts = () => {
         fetchProducts();
     }, [id, productFor]);
 
-    const handleFilterChange = (e) => {
-        setProductFor(e.target.value);
-    }
 
     const renderPrice = (product) => {
         return product.discountPrice > 0 ? (
@@ -94,12 +90,11 @@ const ShowProducts = () => {
                                 id="filterCategory"
                                 className="form-select w-50"
                                 aria-label="Default select example"
-                                onChange={handleFilterChange}
+                                onChange={(e) => setProductFor(e.target.value)}
                             >
                                 <option value="" defaultValue>
                                     All products
                                 </option>
-                                {/* {console.log(filter)} */}
                                 {filter.map((selector) => (
                                     <option value={selector}>{selector.toUpperCase()}</option>
                                 ))}
@@ -108,7 +103,6 @@ const ShowProducts = () => {
                     </div>
                 </div>
 
-                {/* Product Cards */}
                 <div className="products d-flex flex-wrap justify-content-center">
                     {loading ? (
                         <Loader itemName="Loading product" admin={false} />
