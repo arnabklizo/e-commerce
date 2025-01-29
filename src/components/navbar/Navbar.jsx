@@ -8,10 +8,12 @@ import SignupModal from '../../modals/SignupModal/SignupModal';
 import ForgotModal from '../../modals/forgotModal/ForgotModal';
 import { Tooltip } from 'bootstrap';
 import { useNavigate } from "react-router-dom";
-import { isUser, isAdmin } from "../../services/api";
+import { isUser, isAdmin, checkMe, getCart } from "../../services/api";
 
 const Navbar = ({ admin }) => {
     const navigate = useNavigate();
+    const [cart, setCart] = useState()
+    const [userId, setUserId] = useState('')
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [isAdminLogedIn, setAdminLogedIn] = useState(false);
     const [isCartVisible, setCartVisible] = useState(false);
@@ -24,7 +26,10 @@ const Navbar = ({ admin }) => {
         try {
             const userResponse = await isUser();
             setIsLoggedIn(userResponse.data.isAuthenticated);
-
+            if (userResponse.data.isAuthenticated) {
+                const response = await checkMe();
+                setUserId(response.data._id);
+            }
             const adminResponse = await isAdmin();
             setAdminLogedIn(adminResponse.data.isAuthenticated);
         } catch (err) {
@@ -33,9 +38,18 @@ const Navbar = ({ admin }) => {
         }
     };
 
-    useEffect(() => {
-        checkAuth();
-    }, [navigate]);
+    // const userIdChecker = async () => {
+    //     const response = await getCart(userId);
+    //     setCart(response.data.cart)
+    // }
+
+    useEffect(() => { checkAuth(); }, [navigate]);
+    // useEffect(() => {
+    //     if (isLoggedIn == true) {
+    //         userIdChecker()
+    //     }
+    // }, [userId])
+
 
     // Tooltip initialization
     useEffect(() => {
@@ -81,6 +95,7 @@ const Navbar = ({ admin }) => {
     return (
         <>
             <NavbarModal
+                userId={userId}
                 admin={admin}
                 onCartToggle={toggleCart}
                 onLoginToggle={toggleLoginModal}

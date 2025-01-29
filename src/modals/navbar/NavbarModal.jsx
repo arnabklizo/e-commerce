@@ -12,6 +12,7 @@ import {
     faRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
 import "../navbar/navbar.css";
+import { getCart } from '../../services/api.js'
 
 const NavbarModal = ({
     admin,
@@ -20,12 +21,23 @@ const NavbarModal = ({
     isLoggedIn,
     onUserLogout,
     onAdminLogout,
-    isAdminLogedIn
+    isAdminLogedIn,
+    userId
 }) => {
     const navigate = useNavigate();
+    const [cart, setCart] = useState();
     const [isDropped, setDropped] = useState(false);
     const location = useLocation();
 
+    useEffect(() => {
+        cartData()
+    }, [userId])
+
+    const cartData = async () => {
+        const { data } = await getCart(userId);
+        setCart(data.cart);
+    }
+    // back 
     const userNavItems = [
         { path: "/categories", label: "Categories" },
         { path: "/about", label: "About" },
@@ -111,7 +123,7 @@ const NavbarModal = ({
                     <div className="position-relative">
                         <FontAwesomeIcon icon={faCartPlus} />
                         <span className="position-absolute top-10 start-100 translate-middle badge bg-dark text-light rounded-pill">
-                            3
+                            {cart && cart.items.length}
                         </span>
                     </div>
                 </button>

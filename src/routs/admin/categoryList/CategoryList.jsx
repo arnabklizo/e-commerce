@@ -77,21 +77,33 @@ const CategoryList = () => {
         }
     };
 
-    const handleSaveCategory = async (updatedCategory) => {
-        try {
-            setLoading(true);
-            const response = await updateCategory(updatedCategory);
-            setCategories((prevCategories) =>
-                prevCategories.map((cat) => (cat._id === updatedCategory._id ? response.data.category : cat))
-            );
-            toast.success(response.data.message);
-            closeEditModal();
-        } catch (error) {
-            console.error('Error updating category:', error);
-            toast.error('Failed to update category. Please try again.');
-        } finally {
-            setLoading(false);
-        }
+    const handleSaveCategory = () => {
+        // console.log('updatedCategory', updatedCategory)
+        // setLoading(true);
+        // // try {
+        // //     const response = await updateCategory(updatedCategory);
+        // //     setCategories((prevCategories) =>
+        // //         prevCategories.map((cat) => (cat._id === updatedCategory._id ? response.data.category : cat))
+        // //     );
+        // //     toast.success(response.data.message);
+        // //     closeEditModal();
+
+        // const formData = new FormData();
+        // formData.append("name", updatedCategory.name);
+        // formData.append("image", updatedCategory.image);
+        // console.log('formData', formData)
+        // try {
+        //     const res = await updateCategory(updatedCategory);
+        //     toast.success(res.data.message);
+        //     fetchCategories(currentPage);
+        // } catch (error) {
+        //     console.error('Error updating category:', error);
+        //     toast.error('Failed..!! Please try again.');
+        // } finally {
+        //     setLoading(false);
+        // }
+
+        fetchCategories(currentPage);
     };
 
     const deleteCategory = (id) => {

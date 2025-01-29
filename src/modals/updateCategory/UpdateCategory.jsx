@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Tooltip } from 'bootstrap';
-import axios from 'axios';
+import { toast } from 'react-toastify';
+import { updateCategory } from '../../services/api';
+
 
 const UpdateCategory = ({ isVisible, onClose, category, onSave }) => {
     const [name, setName] = useState(category?.name || '');
     const [imageUrl, setImageUrl] = useState(category?.imageUrl || '');
+    const [image, setImage] = useState(null);
     const [file, setFile] = useState(null); // Store file for upload
     const [loading, setLoading] = useState(false);
 
@@ -13,16 +15,16 @@ const UpdateCategory = ({ isVisible, onClose, category, onSave }) => {
         if (category) {
             setName(category.name);
             setImageUrl(category.imageUrl);
+            setImage(category.imageUrl);
         }
     }, [category]);
 
     // Handle file input and preview
     const handleFileChange = (e) => {
         const file = e.target.files[0];
-        // console.log('Selected file:', file);
-
         if (file) {
             setFile(file);
+            setImage(e.target.files[0]);
             const reader = new FileReader();
             reader.onload = () => {
                 setImageUrl(reader.result); // Preview image
@@ -37,48 +39,36 @@ const UpdateCategory = ({ isVisible, onClose, category, onSave }) => {
     // Save category details
 
     const handleSave = async (e) => {
+        // e.preventDefault();
+        // setLoading(true);
+        // try {
+        //     onSave({ ...category, name, image });
+        //     onClose();
+        // } catch (error) {
+        //     console.error('Error updating category:', error);
+        //     alert('Error updating category. Please try again.');
+        // } finally {
+        //     setLoading(false);
+        // }
+
         e.preventDefault();
         setLoading(true);
 
+        const formData = new FormData();
+        formData.append("name", name);
+        if (image) {
+            formData.append("image", image);
+        }
+
         try {
-            // let uploadedImageUrl = imageUrl;
-
-            // If a new image file is selected, upload it to Cloudinary
-            // if (file) {
-            //     const formData = new FormData();
-            //     formData.append('file', file);
-            //     formData.append('upload_preset', 'ml_default'); // Update to your Cloudinary preset
-
-
-            //     // Upload image to Cloudinary
-            //     const response = await fetch('https://api.cloudinary.com/v1_1/ddjjlvsdi/image/upload/', {
-            //         method: 'POST',
-            //         body: formData,
-            //     });
-
-            //     if (!response.ok) {
-            //         console.error('Failed to upload image. Status:', response.status, await response.text());
-            //         throw new Error('Failed to upload image to Cloudinary');
-            //     }
-
-            //     const data = await response.json();
-            //     // console.log("Cloudinary Response:", data);
-            //     if (!data.secure_url) {
-            //         console.error('Cloudinary response does not contain secure_url:', data)
-            //         throw new Error('Image URL not returned by Cloudinary');
-            //     }
-
-            //     uploadedImageUrl = data.secure_url; // Use the new Cloudinary image URL
-            // }
-
-            // Pass the updated category details to the parent component
-            onSave({ ...category, name, imageUrl: imageUrl });
-            onClose();
+            const res = await updateCategory(category._id, formData);
+            toast.success(res.data.message);
         } catch (error) {
-            console.error('Error updating category:', error);
-            alert('Error updating category. Please try again.');
+            console.error("Error updating category:", error.response?.data);
         } finally {
             setLoading(false);
+            onSave();
+            onClose();
         }
     };
 

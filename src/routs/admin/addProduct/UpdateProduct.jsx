@@ -89,6 +89,7 @@ const UpdateProduct = () => {
                 if (key === 'images') {
                     // Append each file separately
                     value.forEach((file) => form.append('images', file));
+
                 } else {
                     // For other arrays, stringify the values
                     form.append(key, JSON.stringify(value));

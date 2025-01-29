@@ -8,12 +8,15 @@ import ConfirmationModal from '../../../modals/confirmationModal/ConfirmationMod
 import ReviewModal from '../../../modals/reviewModal/ReviewModal';
 import { Tooltip } from "bootstrap";
 import { faCircleDot, faCartPlus, faHeart, faStar, faLeftLong, faTrashCan, faPencil } from '@fortawesome/free-solid-svg-icons';
-import { isUser, checkMe, getProduct, getReviews, addReview, deleteReview } from '../../../services/api';
+import { isUser, checkMe, getProduct, getReviews, addReview, deleteReview, addToCart } from '../../../services/api';
 import './product.css';
 import Loader from '../../../components/loader/Loader';
 import parse from 'html-react-parser';
 
+
+
 const ProductDetails = () => {
+    const [quantity, setQuantity] = useState(1)
     const [isReviewVisible, setReviewVisible] = useState(false); // for edit review modal
     const [selectedReview, setSelectedReview] = useState(null); // for edit review modal
     const [isConfirmModalVisible, setConfirmModalVisible] = useState(false); //for confirmation Modal
@@ -60,8 +63,17 @@ const ProductDetails = () => {
             setLoading(false);
         }
     };
-
     useEffect(() => { fetchInitialData(); }, [id, users]);
+
+    //add to cart
+    const addAtCart = async () => {
+        try {
+            const response = await addToCart({ userId, productId: id, quantity });
+            toast.success(response.data.message);
+        } catch (error) {
+            console.error("Error adding to cart:", error);
+        }
+    };
 
     // submite review 
     const handleSubmitReview = async (e) => {
@@ -189,13 +201,13 @@ const ProductDetails = () => {
 
                                 <div className="text-center text-sm-start">
                                     <div className="btn-group my-1" role="group">
-                                        <button type="button" className="btn btn-dark">-</button>
+                                        <button type="button" className="btn btn-dark" onClick={() => quantity > 1 ? setQuantity(quantity - 1) : 1}>-</button>
                                         <div className="productNumb d-flex align-items-center justify-content-center border border-dark">
-                                            1
+                                            {quantity}
                                         </div>
-                                        <button type="button" className="btn btn-dark">+</button>
+                                        <button type="button" className="btn btn-dark" onClick={() => setQuantity(quantity + 1)}>+</button>
                                     </div>
-                                    <button className="btn btn-dark roboto whiteIcon ms-sm-3 my-1">
+                                    <button className="btn btn-dark roboto whiteIcon ms-sm-3 my-1" onClick={addAtCart}>
                                         <FontAwesomeIcon icon={faCartPlus} className="me-1" />
                                         ADD TO CART
                                     </button>

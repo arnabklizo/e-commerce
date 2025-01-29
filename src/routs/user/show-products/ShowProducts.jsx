@@ -95,8 +95,8 @@ const ShowProducts = () => {
                                 <option value="" defaultValue>
                                     All products
                                 </option>
-                                {filter.map((selector) => (
-                                    <option value={selector}>{selector.toUpperCase()}</option>
+                                {filter.map((selector, index) => (
+                                    <option value={selector} key={index}>{selector.toUpperCase()}</option>
                                 ))}
                             </select>
                         </>}
@@ -145,7 +145,7 @@ const ShowProducts = () => {
                                 <div className="card-body">
                                     <div className="card-text">
                                         {product.productFeatures.slice(0, 3).map((feature, index) => (
-                                            <div className="pointKeysCard" key={feature}>
+                                            <div className="pointKeysCard" key={index}>
                                                 <FontAwesomeIcon icon={faHandPointRight} className="me-1" />
                                                 <span className="keys">
                                                     {index === 2 && product.productFeatures.length > 3 ? '...' : feature}

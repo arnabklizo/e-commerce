@@ -1,9 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import '../cartModal/cartModal.css'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan, faLeftLong, faPrint } from "@fortawesome/free-solid-svg-icons";
+import { getCart } from "../../services/api";
 
 const Cartmodal = ({ isVisible, onClose }) => {
+    const [cart, setCart] = useState(null);
+
+    // back 
     if (isVisible == true) {
         document.body.classList.add('overlayed')
     } else {
