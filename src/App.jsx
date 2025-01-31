@@ -32,6 +32,7 @@ import PreviewProduct from './routs/admin/previewProduct/PreviewProduct.jsx';
 import AdminLogin from './routs/admin/login/AdminLogin.jsx';
 import UpdateProduct from './routs/admin/addProduct/UpdateProduct.jsx';
 import { ToastContainer } from "react-toastify";
+import Cart from './routs/user/cart/Cart.jsx';
 
 
 // import Alert from './components/Alert';
@@ -148,7 +149,14 @@ function App() {
               </Layout>
             }
           />
-
+          <Route
+            path="/cart/:id"
+            element={
+              <Layout>
+                <Cart />
+              </Layout>
+            }
+          />
 
           {/* admin section  */}
 

@@ -100,7 +100,6 @@ const about = () => {
                     </div>
                     <div className="separetor my-5 mx-auto bg-dark"></div>
                 </div>
-
             </section>
 
         </>

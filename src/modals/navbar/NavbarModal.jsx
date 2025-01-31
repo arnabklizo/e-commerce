@@ -14,6 +14,7 @@ import {
 import "../navbar/navbar.css";
 import { getCart } from '../../services/api.js'
 
+
 const NavbarModal = ({
     admin,
     onCartToggle,
@@ -25,19 +26,17 @@ const NavbarModal = ({
     userId
 }) => {
     const navigate = useNavigate();
-    const [cart, setCart] = useState();
     const [isDropped, setDropped] = useState(false);
     const location = useLocation();
-
-    useEffect(() => {
-        cartData()
-    }, [userId])
-
-    const cartData = async () => {
+    const [cart, setCart] = useState('')
+    const fetchCart = async () => {
         const { data } = await getCart(userId);
         setCart(data.cart);
     }
-    // back 
+    useEffect(() => {
+        if (userId !== '') fetchCart()
+    })
+    // back
     const userNavItems = [
         { path: "/categories", label: "Categories" },
         { path: "/about", label: "About" },
@@ -51,7 +50,7 @@ const NavbarModal = ({
     useEffect(() => {
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
         tooltipTriggerList.forEach((tooltipTriggerEl) => new Tooltip(tooltipTriggerEl));
-    }, []);
+    }, [navigate]);
 
     const toggleDropdown = () => setDropped(!isDropped);
 
@@ -118,19 +117,20 @@ const NavbarModal = ({
                     </button>
                 </form>
             </li>
-            <li className="nav-item" data-bs-toggle="tooltip" title="Cart" data-bs-placement="bottom">
-                <button className="shoppingCart nav-link d-flex justify-content-center justify-content-lg-end mx-2" onClick={onCartToggle}>
-                    <div className="position-relative">
-                        <FontAwesomeIcon icon={faCartPlus} />
-                        <span className="position-absolute top-10 start-100 translate-middle badge bg-dark text-light rounded-pill">
-                            {cart && cart.items.length}
-                        </span>
-                    </div>
-                </button>
-            </li>
+
 
             {isLoggedIn ? (
                 <>
+                    <li className="nav-item" data-bs-toggle="tooltip" title="Cart" data-bs-placement="bottom">
+                        <button className="shoppingCart nav-link d-flex justify-content-center justify-content-lg-end mx-2" onClick={onCartToggle}>
+                            <div className="position-relative">
+                                <FontAwesomeIcon icon={faCartPlus} />
+                                <span className="position-absolute top-10 start-100 translate-middle badge bg-dark text-light rounded-pill">
+                                    {cart !== '' ? cart.items.length : ''}
+                                </span>
+                            </div>
+                        </button>
+                    </li>
                     <li className="nav-item" data-bs-toggle="tooltip" title="Profile" data-bs-placement="bottom" >
                         <Link className="btn btnAcc" to="/profile">
                             <FontAwesomeIcon icon={faUser} />

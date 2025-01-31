@@ -8,3 +8,12 @@
     left: 0;
     z-index: 1044;
 }
+
+.cardDlt:active path {
+    color: #e63946;
+}
+
+.productCartImg:hover img,
+.productCartImg img {
+    transition: all 0.2s;
+}

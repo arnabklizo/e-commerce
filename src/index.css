@@ -209,12 +209,12 @@ svg path {
 }
 
 .productCartImg img {
-  transition: all 0.4 linear;
+  transition: all 0.4;
 }
 
 .productCartImg:hover img {
   scale: 1.1;
-  transition: all 0.4 linear;
+  transition: all 0.4;
 }
 
 .cartQty {
