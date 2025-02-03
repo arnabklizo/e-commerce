@@ -34,7 +34,7 @@ const NavbarModal = ({
         setCart(data.cart);
     }
     useEffect(() => {
-        if (userId !== '') fetchCart()
+        if (userId !== '') { fetchCart(); }
     })
     // back
     const userNavItems = [
@@ -109,6 +109,7 @@ const NavbarModal = ({
 
     const renderUserNav = () => (
         <>
+
             <li className="nav-item">
                 <form className="d-flex navSearchForm" role="search">
                     <input className="navSearch" type="text" placeholder="Search product" />
@@ -122,7 +123,11 @@ const NavbarModal = ({
             {isLoggedIn ? (
                 <>
                     <li className="nav-item" data-bs-toggle="tooltip" title="Cart" data-bs-placement="bottom">
-                        <button className="shoppingCart nav-link d-flex justify-content-center justify-content-lg-end mx-2" onClick={onCartToggle}>
+                        <button
+                            className="shoppingCart nav-link d-flex justify-content-center justify-content-lg-end mx-2"
+                            onClick={onCartToggle}
+                            disabled={location.pathname === `/cart/${userId}` && 'true'}
+                        >
                             <div className="position-relative">
                                 <FontAwesomeIcon icon={faCartPlus} />
                                 <span className="position-absolute top-10 start-100 translate-middle badge bg-dark text-light rounded-pill">

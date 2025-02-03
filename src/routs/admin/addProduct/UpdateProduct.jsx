@@ -3,7 +3,6 @@ import ReactQuill from 'react-quill';
 import { Tooltip } from 'bootstrap';
 import { useNavigate, useParams } from 'react-router-dom';
 import Loader from '../../../components/loader/Loader';
-import { isAdmin } from '../../../services/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashCan, faLeftLong } from '@fortawesome/free-solid-svg-icons';
 import 'react-quill/dist/quill.snow.css';
@@ -32,13 +31,6 @@ const UpdateProduct = () => {
 
 
     useEffect(() => {
-        const checkAuth = async () => {
-            const adminResponse = await isAdmin();
-            if (!adminResponse.data.isAuthenticated) {
-                navigate("/adminLogin");
-            }
-        };
-
         const fetchData = async () => {
             try {
                 const [categoriesResponse, productResponse] = await Promise.all([
@@ -64,7 +56,6 @@ const UpdateProduct = () => {
                 setLoading(false);
             }
         };
-        checkAuth();
         fetchData();
     }, [id, navigate]);
 

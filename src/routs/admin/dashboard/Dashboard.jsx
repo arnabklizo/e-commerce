@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Tooltip } from 'bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useNavigate } from 'react-router-dom';
 import {
     faBoxOpen,
     faCartShopping,
@@ -14,29 +13,10 @@ import {
     faCalendarDays,
     faArrowDownLong,
 } from '@fortawesome/free-solid-svg-icons';
-
-import { isAdmin } from '../../../services/api';
 import TimeNow from '../../../components/timer/TimeNow';
 import '../../admin/dashboard/dashboard.css'
 
 const Dashboard = () => {
-
-
-    const navigate = useNavigate();
-    useEffect(() => {
-        const checkAuth = async () => {
-            const adminResponse = await isAdmin();
-            if (!adminResponse.data.isAuthenticated) {
-                navigate("/adminLogin");
-            }
-        };
-        checkAuth();
-    }, [navigate]);
-
-
-
-
-
 
     useEffect(() => {
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');

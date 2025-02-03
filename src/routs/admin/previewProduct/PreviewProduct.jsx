@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { isAdmin } from '../../../services/api';
 import { useNavigate } from 'react-router-dom';
 import { faCircleDot, faLeftLong } from '@fortawesome/free-solid-svg-icons';
 import '../previewProduct/previewProduct.css';
@@ -43,20 +42,7 @@ const PreviewProduct = () => {
     };
 
 
-    useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                const adminResponse = await isAdmin();
-                if (!adminResponse.data.isAuthenticated) {
-                    navigate("/dashboard");
-                }
-            } catch (err) {
-                navigate("/adminLogin");
-            }
-        };
 
-        checkAuth();
-    }, [navigate]);
 
     return (
         <>

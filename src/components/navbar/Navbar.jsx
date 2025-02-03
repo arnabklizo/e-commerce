@@ -57,6 +57,7 @@ const Navbar = ({ admin }) => {
     const toggleSignupModal = () => setSignModalVisible(prev => !prev);
     const toggloForgotModal = () => setForgot(prev => !prev);
 
+
     const handleLogout = async (logoutFunc, redirectUrl) => {
         try {
             const response = await logoutFunc();

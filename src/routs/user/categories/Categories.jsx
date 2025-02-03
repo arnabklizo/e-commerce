@@ -43,7 +43,7 @@ const Categories = () => {
                         <div className="categoryDiv d-flex flex-wrap justify-content-center">
                             {categories.map((category) => (
                                 <Link
-                                    to={`/showroducts/${category._id}`}
+                                    to={`/showproducts/${category._id}`}
                                     className="categories text-decoration-none m-2"
                                     key={category._id}
                                 >

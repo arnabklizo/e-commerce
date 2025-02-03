@@ -1,22 +1,12 @@
 import React, { useEffect } from 'react';
 import './viewOrder.css'
 import { useNavigate } from 'react-router-dom';
-import { isUser } from '../../../services/api';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleXmark, faLeftLong, faPrint } from "@fortawesome/free-solid-svg-icons";
 
 const ViewOrtder = () => {
     const navigate = useNavigate();
-    useEffect(() => {
-        const checkAuth = async () => {
-            const adminResponse = await isUser();
-            if (!adminResponse.data.isAuthenticated) {
-                navigate("/");
-                toast.error('You are not authorized to view this page');
-            }
-        };
-        checkAuth();
-    }, [navigate]);
+
 
 
     const goBack = () => {

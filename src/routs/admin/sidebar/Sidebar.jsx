@@ -21,7 +21,7 @@ const Sidebar = () => {
     const menuItems = [
         { path: '/dashboard', label: 'DashBoard', icon: faBoxesStacked },
         { path: '/allProducts', label: 'All Products', icon: faDolly },
-        { path: '/orderLiist', label: 'Order List', icon: faTruckRampBox },
+        { path: '/orderList', label: 'Order List', icon: faTruckRampBox },
         { path: '/allUsers', label: 'All Users', icon: faUsers },
         { path: '/categoryList', label: 'Category List', icon: faList },
     ];

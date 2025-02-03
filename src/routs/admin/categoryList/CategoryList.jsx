@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Tooltip } from 'bootstrap';
-import { useNavigate } from 'react-router-dom';
-import { isAdmin } from '../../../services/api';
 import TimeNow from '../../../components/timer/TimeNow';
 import CategoryAdd from '../../../modals/categoryModal/CategoryAdd';
 import UpdateCategory from '../../../modals/updateCategory/UpdateCategory';
@@ -39,17 +37,6 @@ const CategoryList = () => {
     const [sortField, setSortField] = useState('createdAt');
     const [sortOrder, setSortOrder] = useState('desc');
 
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        const checkAuth = async () => {
-            const adminResponse = await isAdmin();
-            if (!adminResponse.data.isAuthenticated) {
-                navigate("/adminLogin");
-            }
-        };
-        checkAuth();
-    }, [navigate]);
 
     useEffect(() => {
         fetchCategories(currentPage);

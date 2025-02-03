@@ -1,28 +1,14 @@
 import React, { useEffect } from 'react'
 import { Tooltip } from 'bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { isUser } from '../../../services/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLeftLong, faCartPlus, faShirt, faHandPointRight } from '@fortawesome/free-solid-svg-icons';
 import { product } from '../../../constans/product';
 import { toast } from 'react-toastify';
 import './wishlist.css'
 
-const Wishlist = () => {
+const Wishlist = (userId) => {
     const navigate = useNavigate();
-    useEffect(() => {
-        const checkAuth = async () => {
-            const adminResponse = await isUser();
-            if (!adminResponse.data.isAuthenticated) {
-                navigate("/");
-                toast.error('You are not authorized user !!');
-            }
-        };
-        checkAuth();
-    }, [navigate]);
-
-
-
 
     useEffect(() => {
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
@@ -35,13 +21,12 @@ const Wishlist = () => {
     }, []);
 
 
-
-
     const goBack = () => {
         navigate(-1);
     };
     return (
         <>
+            {console.log('id :', userId.userId)}
             <section className="showAllProducts">
                 <div className="container">
 

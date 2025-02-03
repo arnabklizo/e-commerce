@@ -1,13 +1,14 @@
-import React, { useState } from 'react'
-// import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import './App.css'
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import "./App.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
-// import Navbar from './components/navbar/Navbar.jsx';
+import Loader from "./components/loader/Loader.jsx";
+import Layout from "./routs/user/Layout.jsx";
+import AdminLayout from "./routs/admin/adminLayout/AdminLayout.jsx";
+import { ToastContainer } from "react-toastify";
 
-import Layout from './routs/user/Layout.jsx';
 import Landing from './routs/user/landing/Landing.jsx';
 import About from './routs/user/about/about.jsx';
 import Terms from './routs/user/terms/Terms.jsx';
@@ -19,8 +20,8 @@ import Wishlist from './routs/user/wishlist/Wishlist.jsx';
 import Profile from './routs/user/profile/Profile.jsx';
 import ViewOrtder from './routs/user/viewOrder/ViewOrtder.jsx';
 import ResetPassword from './routs/user/resetPass/ResetPassword.jsx';
+import Cart from './routs/user/cart/Cart.jsx';
 
-import AdminLayout from './routs/admin/adminLayout/AdminLayout.jsx';
 import Dashboard from './routs/admin/dashboard/Dashboard.jsx'
 import AllProducts from './routs/admin/allProducts/AllProducts.jsx';
 import OrderList from './routs/admin/orderList/OrderList.jsx';
@@ -31,219 +32,100 @@ import NewProduct from './routs/admin/newProduct/NewProduct.jsx';
 import PreviewProduct from './routs/admin/previewProduct/PreviewProduct.jsx';
 import AdminLogin from './routs/admin/login/AdminLogin.jsx';
 import UpdateProduct from './routs/admin/addProduct/UpdateProduct.jsx';
-import { ToastContainer } from "react-toastify";
-import Cart from './routs/user/cart/Cart.jsx';
+
+import NotFound from './components/notFound/NotFound.jsx';
 
 
-// import Alert from './components/Alert';
-// import TextForms from './components/TextForms';
-// import Foot from './components/Foot';
+import { isUser, isAdmin, checkMe } from "./services/api.js";
 
 function App() {
-  // const [islogin, setlogin] = useState(false);
-  // const openLogin = () => setlogin(true);
-  // const closeLogin = () => setlogin(false);
+  const [userId, setUserId] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdminLogedIn, setIsAdminLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const [userResponse, adminResponse] = await Promise.all([isUser(), isAdmin()]);
+        const isUserAuth = userResponse.data.isAuthenticated;
+        const isAdminAuth = adminResponse.data.isAuthenticated;
+
+        setIsLoggedIn(isUserAuth);
+        setIsAdminLoggedIn(isAdminAuth);
+
+        if (isUserAuth) {
+          const response = await checkMe();
+          setUserId(response.data._id);
+        }
+      } catch (err) {
+        console.error("Authentication error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    checkAuth();
+  }, []);
+
+  const renderWithLayout = (Component, props = {}) => (
+    <Layout >
+      {loading ? <Loader itemName="Loading" admin={false} /> : <Component {...props} />}
+    </Layout>
+  );
+
+  const protectedRoute = (Component, props = {}) => (
+    loading ? renderWithLayout(Loader, { itemName: "Loading", admin: false }) :
+      isLoggedIn ? renderWithLayout(Component, props) : <Navigate to="/" replace />
+  );
 
   return (
     <>
-      <ToastContainer
-        position="top-center"
-        autoClose={2000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
+      <ToastContainer position="top-center" autoClose={2000} hideProgressBar={false} />
 
       <Router>
         <Routes>
-          <Route
-            path="/"
-            element={
-              <Layout>
-                <Landing />
-              </Layout>
-            }
-          />
-          <Route
-            path="/about"
-            element={
-              <Layout>
-                <About />
-              </Layout>
-            }
-          />
-          <Route
-            path="/contact"
-            element={
-              <Layout>
-                <Contact />
-              </Layout>
-            }
-          />
-          <Route
-            path="/terms"
-            element={
-              <Layout>
-                <Terms />
-              </Layout>
-            }
-          />
-          <Route
-            path="/categories"
-            element={
-              <Layout>
-                <Categories />
-              </Layout>
-            }
-          />
-          <Route
-            path="/showroducts/:id"
-            element={
-              <Layout>
-                <ShowProducts />
-              </Layout>
-            }
-          />
-          <Route
-            path="/product/:id"
-            element={
-              <Layout>
-                <Product />
-              </Layout>
-            }
-          />
-          <Route
-            path="/wishlist"
-            element={
-              <Layout>
-                <Wishlist />
-              </Layout>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <Layout>
-                <Profile />
-              </Layout>
-            }
-          />
-          <Route
-            path="/order"
-            element={
-              <Layout>
-                <ViewOrtder />
-              </Layout>
-            }
-          />
-          <Route
-            path="/reset"
-            element={
-              <Layout>
-                <ResetPassword />
-              </Layout>
-            }
-          />
-          <Route
-            path="/cart/:id"
-            element={
-              <Layout>
-                <Cart />
-              </Layout>
-            }
-          />
+          {/* Public Routes */}
+          <Route path="/" element={renderWithLayout(Landing)} />
+          <Route path="/about" element={renderWithLayout(About)} />
+          <Route path="/contact" element={renderWithLayout(Contact)} />
+          <Route path="/terms" element={renderWithLayout(Terms)} />
+          <Route path="/categories" element={renderWithLayout(Categories)} />
+          <Route path="/showproducts/:id" element={renderWithLayout(ShowProducts)} />
 
-          {/* admin section  */}
+          {/* Product Route with Conditional User Info */}
+          <Route path="/product/:id" element={loading ? renderWithLayout(Loader, { itemName: "Loading", admin: false }) : renderWithLayout(Product, { userId })} />
 
-          <Route
-            path="/dashboard"
-            element={
-              <AdminLayout admin>
-                <Dashboard />
-              </AdminLayout>
-            }
-          />
-          <Route
-            path="/allProducts"
-            element={
-              <AdminLayout admin>
-                <AllProducts />
-              </AdminLayout>
-            }
-          />
-          <Route
-            path="/orderLiist"
-            element={
-              <AdminLayout admin>
-                <OrderList />
-              </AdminLayout>
-            }
-          />
-          <Route
-            path="/allUsers"
-            element={
-              <AdminLayout admin>
-                <AllUsers />
-              </AdminLayout>
-            }
-          />
-          <Route
-            path="/categoryList"
-            element={
-              <AdminLayout admin>
-                <CategoryList />
-              </AdminLayout>
-            }
-          />
-          <Route
-            path="/adminProfile"
-            element={
-              <Layout admin>
-                <AdminProfile />
-              </Layout>
-            }
-          />
-          <Route
-            path="/addProduct"
-            element={
-              <Layout admin>
-                <NewProduct />
-              </Layout>
-            }
-          />
-          <Route
-            path="/updateProduct/:id"
-            element={
-              <Layout admin>
-                <UpdateProduct />
-              </Layout>
-            }
-          />
-          <Route
-            path="/previewProduct/:id"
-            element={
-              <Layout admin>
-                <PreviewProduct />
-              </Layout>
-            }
-          />
-          <Route
-            path="/adminLogin"
-            element={
-              <Layout admin>
-                <AdminLogin />
-              </Layout>
-            }
-          />
+          {/* Protected User Routes */}
+          <Route path="/cart/:id" element={protectedRoute(Cart, { userId })} />
+          <Route path="/profile" element={protectedRoute(Profile)} />
+          <Route path="/wishlist" element={protectedRoute(Wishlist, { userId })} />
+          <Route path="/reset" element={protectedRoute(ResetPassword, { userId })} />
+          <Route path="/order" element={protectedRoute(ViewOrtder, { userId })} />
+
+          {/* Admin Routes */}
+          <Route path="/adminLogin" element={<Layout admin><AdminLogin /></Layout>} />
+          {isAdminLogedIn && (
+            <>
+              <Route path="/dashboard" element={<AdminLayout admin><Dashboard /></AdminLayout>} />
+              <Route path="/allProducts" element={<AdminLayout admin><AllProducts /></AdminLayout>} />
+              <Route path="/orderList" element={<AdminLayout admin><OrderList /></AdminLayout>} />
+              <Route path="/allUsers" element={<AdminLayout admin><AllUsers /></AdminLayout>} />
+              <Route path="/categoryList" element={<AdminLayout admin><CategoryList /></AdminLayout>} />
+
+              {/* layout changed */}
+              <Route path="/updateProduct/:id" element={<Layout admin><UpdateProduct /></Layout>} />
+              <Route path="/previewProduct/:id" element={<Layout admin><PreviewProduct /></Layout>} />
+              <Route path="/adminProfile" element={<Layout admin><AdminProfile /></Layout>} />
+              <Route path="/addProduct" element={<Layout admin><NewProduct /></Layout>} />
+            </>
+          )}
+
+          {/* 404 Route */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

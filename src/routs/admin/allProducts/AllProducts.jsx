@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { isAdmin } from '../../../services/api';
+import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ConfirmationModal from '../../../modals/confirmationModal/ConfirmationModal';
 import {
@@ -38,17 +37,7 @@ const AllProducts = () => {
     const [sortOrder, setSortOrder] = useState('desc');
     const [selectedCategory, setSelectedCategory] = useState('');
 
-    const navigate = useNavigate();
 
-    useEffect(() => {
-        const checkAuth = async () => {
-            const adminResponse = await isAdmin();
-            if (!adminResponse.data.isAuthenticated) {
-                navigate("/adminLogin");
-            }
-        };
-        checkAuth();
-    }, [navigate]);
 
     useEffect(() => {
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');

@@ -8,14 +8,14 @@ import ConfirmationModal from '../../../modals/confirmationModal/ConfirmationMod
 import ReviewModal from '../../../modals/reviewModal/ReviewModal';
 import { Tooltip } from "bootstrap";
 import { faCircleDot, faCartPlus, faHeart, faStar, faLeftLong, faTrashCan, faPencil } from '@fortawesome/free-solid-svg-icons';
-import { isUser, checkMe, getProduct, getReviews, addReview, deleteReview, addToCart } from '../../../services/api';
+import { getProduct, getReviews, addReview, deleteReview, addToCart } from '../../../services/api';
 import './product.css';
 import Loader from '../../../components/loader/Loader';
 import parse from 'html-react-parser';
 
 
 
-const ProductDetails = () => {
+const ProductDetails = ({ userId }) => {
     const [quantity, setQuantity] = useState(1)
     const [isReviewVisible, setReviewVisible] = useState(false); // for edit review modal
     const [selectedReview, setSelectedReview] = useState(null); // for edit review modal
@@ -23,7 +23,6 @@ const ProductDetails = () => {
     const [confirmationId, setConfirmationId] = useState(''); //for confirmation Modal
     const [reviewText, setReviewText] = useState("");
     const [rating, setRating] = useState(5);
-    const [userId, setUserId] = useState('');
     const [users, setUsers] = useState(false);
     const [reviews, setReviews] = useState([]);
     const [productItem, setProductItem] = useState('');
@@ -43,19 +42,14 @@ const ProductDetails = () => {
     const fetchInitialData = async () => {
         setLoading(true);
         try {
-            const [productResponse, reviewsResponse, userResponse] = await Promise.all([
+            const [productResponse, reviewsResponse] = await Promise.all([
                 getProduct(id),
-                getReviews(id),
-                isUser(),
+                getReviews(id)
             ]);
             setProductItem(productResponse.data);
             setReviews(reviewsResponse.data);
-            if (userResponse.data.isAuthenticated == true) {
+            if (userId) {
                 setUsers(true);
-            }
-            const user = await checkMe();
-            if (user.data) {
-                setUserId(user.data._id);
             }
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -68,7 +62,7 @@ const ProductDetails = () => {
     //add to cart
     const addAtCart = async () => {
         try {
-            const response = await addToCart({ userId, productId: id, quantity });
+            const response = await addToCart({ userId: userId, productId: id, quantity });
             toast.success(response.data.message);
         } catch (error) {
             console.error("Error adding to cart:", error);
@@ -83,7 +77,7 @@ const ProductDetails = () => {
         try {
             const response = await addReview({
                 productId: id,
-                userId,
+                userId: userId,
                 review: reviewText,
                 rating,
             })

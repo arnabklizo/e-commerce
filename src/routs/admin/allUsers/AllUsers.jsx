@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Tooltip } from "bootstrap";
-import { useNavigate } from 'react-router-dom';
-import { isAdmin } from '../../../services/api';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -22,17 +20,6 @@ import TimeNow from '../../../components/timer/TimeNow';
 import '../allUsers/AllUsers.css';
 
 const AllUsers = () => {
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        const checkAuth = async () => {
-            const adminResponse = await isAdmin();
-            if (!adminResponse.data.isAuthenticated) {
-                navigate("/adminLogin");
-            }
-        };
-        checkAuth();
-    }, [navigate]);
 
 
     useEffect(() => {

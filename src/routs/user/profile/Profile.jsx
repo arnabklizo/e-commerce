@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { isUser, checkMe, updateUser, getReviewsByUser, deleteReview } from '../../../services/api';
+import { checkMe, updateUser, getReviewsByUser, deleteReview } from '../../../services/api';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ConfirmationModal from '../../../modals/confirmationModal/ConfirmationModal';
 import { faUserPen, faPlus, faPencil, faTrash, faLeftLong, faStar, faUnlockKeyhole, faTrashCan } from "@fortawesome/free-solid-svg-icons";
@@ -55,19 +55,7 @@ const Profile = () => {
         }
     };
 
-    useEffect(() => {
-        const authCheck = async () => {
-            const adminResponse = await isUser();
-            if (!adminResponse.data.isAuthenticated) {
-                navigate("/");
-                toast.error('You are not authorized user.!');
-                return;
-            }
-        }
-
-        authCheck();
-        fetchData();
-    }, [navigate]);
+    useEffect(() => { fetchData(); }, [navigate]);
 
     // frofile submitProfile 
     const submitProfile = async () => {
@@ -84,8 +72,6 @@ const Profile = () => {
             }));
 
             const response = await updateUser(profile._id, updatedProfile, profilePicture, deleteAddresses);
-            // console.log('previewImage', previewImage)
-            // await updateUser(profile._id, updatedProfile);
             setBtnVisible(false); // Hide the button after successful save
             toast.success(response.data.message);
         } catch (error) {
