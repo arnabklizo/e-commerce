@@ -126,7 +126,7 @@ const NavbarModal = ({
                         <button
                             className="shoppingCart nav-link d-flex justify-content-center justify-content-lg-end mx-2"
                             onClick={onCartToggle}
-                            disabled={location.pathname === `/cart/${userId}` && 'true'}
+                            disabled={location.pathname === `/cart/${userId}`}
                         >
                             <div className="position-relative">
                                 <FontAwesomeIcon icon={faCartPlus} />

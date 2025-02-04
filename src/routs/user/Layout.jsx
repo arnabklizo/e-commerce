@@ -3,11 +3,11 @@ import Navbar from '../../components/navbar/Navbar';
 import Footer from '../../components/footer/Footer';
 
 
-const Layout = ({ children, admin }) => {
+const Layout = ({ children, admin, check }) => {
     return (
         <>
 
-            <Navbar admin={admin} />
+            <Navbar admin={admin} check={check} />
             <>{children}</>
             <Footer admin={admin} />
         </>

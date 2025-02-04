@@ -10,7 +10,7 @@ import { Tooltip } from 'bootstrap';
 import { useNavigate } from "react-router-dom";
 import { isUser, isAdmin, checkMe } from "../../services/api";
 
-const Navbar = ({ admin }) => {
+const Navbar = ({ admin, check }) => {
     const navigate = useNavigate();
     const [userId, setUserId] = useState('');
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -31,6 +31,7 @@ const Navbar = ({ admin }) => {
                 const response = await checkMe();
                 setUserId(response.data._id);
             }
+            check();
             setAdminLogedIn(adminResponse.data.isAuthenticated);
         } catch (err) {
             setIsLoggedIn(false);
@@ -38,14 +39,6 @@ const Navbar = ({ admin }) => {
             console.error('Authentication error:', err);
         }
     };
-
-
-
-    useEffect(() => {
-        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(
-            tooltipTriggerEl => new Tooltip(tooltipTriggerEl)
-        );
-    }, []);
 
     useEffect(() => {
         document.body.style.overflow = isLoginModalVisible || isSignModalVisible || isForgotVisible ? 'hidden' : 'auto';
@@ -72,6 +65,7 @@ const Navbar = ({ admin }) => {
 
     return (
         <>
+
             <NavbarModal
                 userId={userId}
                 admin={admin}

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import React, { useState, useEffect, useCallback } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
@@ -39,37 +39,40 @@ import NotFound from './components/notFound/NotFound.jsx';
 import { isUser, isAdmin, checkMe } from "./services/api.js";
 
 function App() {
+  // const navigate = useNavigate()
   const [userId, setUserId] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdminLogedIn, setIsAdminLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [profileData, setProfileData] = useState()
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const [userResponse, adminResponse] = await Promise.all([isUser(), isAdmin()]);
-        const isUserAuth = userResponse.data.isAuthenticated;
-        const isAdminAuth = adminResponse.data.isAuthenticated;
+  const checkAuth = useCallback(async () => {
+    try {
+      const [userResponse, adminResponse] = await Promise.all([isUser(), isAdmin()]);
+      const isUserAuth = userResponse.data.isAuthenticated;
+      const isAdminAuth = adminResponse.data.isAuthenticated;
 
-        setIsLoggedIn(isUserAuth);
-        setIsAdminLoggedIn(isAdminAuth);
+      setIsLoggedIn(isUserAuth);
+      setIsAdminLoggedIn(isAdminAuth);
 
-        if (isUserAuth) {
-          const response = await checkMe();
-          setUserId(response.data._id);
-        }
-      } catch (err) {
-        console.error("Authentication error:", err);
-      } finally {
-        setLoading(false);
+      if (isUserAuth) {
+        const response = await checkMe();
+        setUserId(response.data._id);
+        setProfileData(response.data);
       }
-    };
+    } catch (err) {
+      console.error("Authentication error:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [])
+  useEffect(() => {
     checkAuth();
-  }, []);
+  }, [checkAuth]);
 
   const renderWithLayout = (Component, props = {}) => (
-    <Layout >
-      {loading ? <Loader itemName="Loading" admin={false} /> : <Component {...props} />}
+    <Layout check={checkAuth} >
+      {loading ? <div className="py-5"><div className="my-5 py-5"><Loader itemName="Loading" admin={false} /></div></div> : <Component {...props} />}
     </Layout>
   );
 
@@ -96,7 +99,7 @@ function App() {
           <Route path="/product/:id" element={loading ? renderWithLayout(Loader, { itemName: "Loading", admin: false }) : renderWithLayout(Product, { userId })} />
 
           {/* Protected User Routes */}
-          <Route path="/cart/:id" element={protectedRoute(Cart, { userId })} />
+          <Route path="/cart/:id" element={protectedRoute(Cart, { userId, profileData })} />
           <Route path="/profile" element={protectedRoute(Profile)} />
           <Route path="/wishlist" element={protectedRoute(Wishlist, { userId })} />
           <Route path="/reset" element={protectedRoute(ResetPassword, { userId })} />

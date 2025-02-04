@@ -21,6 +21,7 @@ const LoginModal = ({ isVisible, onClose, onSignToggle, onForgotToggle, onLoginS
             onClose();
         } catch (error) {
             console.error("Not authenticated:", error);
+            toast.error(error.response.data.message)
         }
     };
 
