@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "r
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import 'react-loading-skeleton/dist/skeleton.css';
 
 import Loader from "./components/loader/Loader.jsx";
 import Layout from "./routs/user/Layout.jsx";

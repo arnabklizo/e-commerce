@@ -5,13 +5,23 @@ import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { getCart, updateCart, removeFromCart } from "../../services/api";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
+import Skeleton from 'react-loading-skeleton';
+
 
 const Cartmodal = ({ isVisible, onClose, userId }) => {
     const [cart, setCart] = useState(null);
-
+    const [loading, setLoading] = useState(true);
     const fetchData = async () => {
-        const { data } = await getCart(userId);
-        setCart(data.cart);
+        setLoading(true);
+        try {
+            const { data } = await getCart(userId);
+            setCart(data.cart);
+        } catch (error) {
+            console.error("Error fetching user data:", error);
+        } finally {
+            setLoading(false);
+        }
+
     };
 
     //fetch data
@@ -94,41 +104,66 @@ const Cartmodal = ({ isVisible, onClose, userId }) => {
                 {/* Cart Items */}
                 <div className="cartContext overflow-y-auto">
                     <ul className="list-unstyled">
-                        {cart ? cart.items.map((item, index) => (
-                            <li className="cartList d-flex" key={index}>
-                                <a href="#" className="productCartImg overflow-hidden d-block border rounded">
-                                    <img src={item.productId.imageUrl[0]} alt="" className="w-100" />
-                                </a>
+                        {loading ? <>
+                            <li className="cartList d-flex" >
+                                <div className="productCartImg p-0 overflow-hidden d-block  rounded">
+                                    <Skeleton className="w-100 h-100" />
+                                </div>
                                 <div className="ps-3 productcartBoxs d-flex flex-column justify-content-between position-relative">
                                     <div className="productCategoryOnCart fw-bold pb-2">
-                                        {(item.productId.productFor).toUpperCase()}
+                                        <Skeleton />
                                     </div>
                                     <div className="productNameOncart fw-bold text-dark pb-2">
-                                        {item.productId.name}
+                                        <Skeleton count={3} />
                                     </div>
-                                    <div className="d-flex align-items-center justify-content-between">
-                                        <span className="priceBox text-dark">
-                                            &#8377;<span className="cartPrice text-dark">{item.quantity * (item.productId.price - item.productId.discountPrice)}</span>/-</span>
-                                        <label htmlFor="qty d-flex">
-                                            <div className="btn-group me-2" role="group" aria-label="Second group">
-                                                <button type="button" className="btn btn-sm btn-dark" onClick={() => handleQuantityChange(index, 'decrement')}>-</button>
-                                                <div className="p-1 px-2 border border-dark">{item.quantity}</div>
-                                                <button type="button" className="btn btn-sm btn-dark" onClick={() => handleQuantityChange(index, 'increment')}>+</button>
-                                            </div>
-                                        </label>
-                                    </div>
-                                    <button type="button" className="btn btn-sm cardDlt position-absolute fs-4 top-0 end-0" onClick={() => removeItemFromCart(item.productId._id)}>
-                                        <FontAwesomeIcon icon={faTrashCan} />
-                                    </button>
+
                                 </div>
                             </li>
-                        )) : 'No items in cart'}
+                        </> : <>
+                            {cart.items.length == 0 ? <>
+                                <div className="text-center">Your cart is empty..</div>
+                            </> : <>
+                                {cart.items.map((item, index) => (
+                                    <li className="cartList d-flex" key={index}>
+                                        <a href="#" className="productCartImg overflow-hidden d-block border rounded">
+                                            <img src={item.productId.imageUrl[0]} alt="" className="w-100" />
+                                        </a>
+                                        <div className="ps-3 productcartBoxs d-flex flex-column justify-content-between position-relative">
+                                            <div className="productCategoryOnCart fw-bold pb-2">
+                                                {(item.productId.productFor).toUpperCase()}
+                                            </div>
+                                            <div className="productNameOncart fw-bold text-dark pb-2">
+                                                {item.productId.name}
+                                            </div>
+                                            <div className="d-flex align-items-center justify-content-between">
+                                                <span className="priceBox text-dark">
+                                                    &#8377;<span className="cartPrice text-dark">{item.quantity * (item.productId.price - item.productId.discountPrice)}</span>/-</span>
+                                                <label htmlFor="qty d-flex">
+                                                    <div className="btn-group me-2" role="group" aria-label="Second group">
+                                                        <button type="button" className="btn btn-sm btn-dark" onClick={() => handleQuantityChange(index, 'decrement')}>-</button>
+                                                        <div className="p-1 px-2 border border-dark">{item.quantity}</div>
+                                                        <button type="button" className="btn btn-sm btn-dark" onClick={() => handleQuantityChange(index, 'increment')}>+</button>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                            <button type="button" className="btn btn-sm cardDlt position-absolute fs-4 top-0 end-0" onClick={() => removeItemFromCart(item.productId._id)}>
+                                                <FontAwesomeIcon icon={faTrashCan} />
+                                            </button>
+                                        </div>
+                                    </li>
+                                ))}
+                            </>}
+                        </>}
                     </ul>
                 </div>
                 <div className="text-center mt-2">
-                    <Link className="btn rounded-0 btn-dark mx-auto" to={`/cart/${userId}`} onClick={onClose}>
-                        Continue Shopping
-                    </Link>
+                    {loading ? <Skeleton /> : <>
+                        {cart.items.length > 0 &&
+                            <Link className="btn rounded-0 btn-dark mx-auto" to={`/cart/${userId}`} onClick={onClose}>
+                                Continue Shopping
+                            </Link>
+                        }
+                    </>}
                 </div>
             </div>
         </div>
