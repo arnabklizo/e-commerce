@@ -125,9 +125,10 @@ const Cartmodal = ({ isVisible, onClose, userId }) => {
                             </> : <>
                                 {cart.items.map((item, index) => (
                                     <li className="cartList d-flex" key={index}>
-                                        <a href="#" className="productCartImg overflow-hidden d-block border rounded">
+                                        {console.log(item)}
+                                        <Link to={`/product/${item.productId._id}`} className="productCartImg overflow-hidden d-block border rounded" onClick={handleClose}>
                                             <img src={item.productId.imageUrl[0]} alt="" className="w-100" />
-                                        </a>
+                                        </Link>
                                         <div className="ps-3 productcartBoxs d-flex flex-column justify-content-between position-relative">
                                             <div className="productCategoryOnCart fw-bold pb-2">
                                                 {(item.productId.productFor).toUpperCase()}
