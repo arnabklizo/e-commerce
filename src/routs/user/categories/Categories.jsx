@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { getCategories } from '../../../services/api';
 import { toast } from "react-toastify";
 import Loader from '../../../components/loader/Loader';
+import { Tooltip } from "bootstrap";
 
 const Categories = () => {
     const [categories, setCategories] = useState([]);
@@ -29,6 +30,12 @@ const Categories = () => {
 
         fetchCategories();
     }, []);
+
+    useEffect(() => {
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        tooltipTriggerList.forEach((tooltipTriggerEl) => new Tooltip(tooltipTriggerEl));
+    }, [navigate]);
+
 
     return (
         <section className="categoriesSection">

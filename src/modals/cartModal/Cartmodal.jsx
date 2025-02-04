@@ -105,27 +105,28 @@ const Cartmodal = ({ isVisible, onClose, userId }) => {
                 <div className="cartContext overflow-y-auto">
                     <ul className="list-unstyled">
                         {loading ? <>
-                            <li className="cartList d-flex" >
-                                <div className="productCartImg p-0 overflow-hidden d-block  rounded">
-                                    <Skeleton className="w-100 h-100" />
-                                </div>
-                                <div className="ps-3 productcartBoxs d-flex flex-column justify-content-between position-relative">
-                                    <div className="productCategoryOnCart fw-bold pb-2">
-                                        <Skeleton />
+                            {Array(4).fill(null).map((_, index) => (
+                                <li className="cartList d-flex" >
+                                    <div className="productCartImg p-0 overflow-hidden d-block  rounded">
+                                        <Skeleton className="w-100 h-100" />
                                     </div>
-                                    <div className="productNameOncart fw-bold text-dark pb-2">
-                                        <Skeleton count={3} />
-                                    </div>
+                                    <div className="ps-3 productcartBoxs d-flex flex-column justify-content-between position-relative">
+                                        <div className="productCategoryOnCart fw-bold pb-2">
+                                            <Skeleton />
+                                        </div>
+                                        <div className="productNameOncart fw-bold text-dark pb-2">
+                                            <Skeleton count={3} />
+                                        </div>
 
-                                </div>
-                            </li>
+                                    </div>
+                                </li>
+                            ))}
                         </> : <>
                             {cart.items.length == 0 ? <>
                                 <div className="text-center">Your cart is empty..</div>
                             </> : <>
                                 {cart.items.map((item, index) => (
                                     <li className="cartList d-flex" key={index}>
-                                        {console.log(item)}
                                         <Link to={`/product/${item.productId._id}`} className="productCartImg overflow-hidden d-block border rounded" onClick={handleClose}>
                                             <img src={item.productId.imageUrl[0]} alt="" className="w-100" />
                                         </Link>

@@ -84,6 +84,12 @@ export const updateCart = (data) => API.put("/cart/update", data);
 export const getCart = (id) => API.get(`/cart/${id}`);
 export const clearCart = (data) => API.post("/cart/clear", data);
 
+
+//for wishlist
+export const addToWishlist = (data) => API.post('/wishlist/add', data);
+export const getWishlist = (data) => API.get('/wishlist', data);
+export const removeFromWishlist = (id) => API.delete(`/wishlist/${id}`);
+
 //get productsByCategory
 export const getProductsByCategory = (id, productFor) => API.get(`/products/category/${id}`, {
     params: {

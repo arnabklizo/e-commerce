@@ -28,6 +28,7 @@
     text-overflow: ellipsis;
 }
 
+.products .card-img-top,
 .products img {
     height: 250px;
     object-fit: cover;

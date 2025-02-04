@@ -206,13 +206,7 @@ const Profile = () => {
         setReviewVisible(false);
         fetchData();
     };
-    // if (loading) return (
-    //     <section className="py-5">
-    //         <div className="h-100 my-5 py-5">
-    //             <Loader itemName="Loading your profile" admin={false} />
-    //         </div>
-    //     </section>
-    // )
+
     return (
         <>
             <section className="profileSection mb-4">
